@@ -28,6 +28,16 @@ Updated the daily routine to run explicit WebSearch passes for global intelligen
 
 Known gap carried forward: the routine still can't write back to this database (it runs in an isolated cloud sandbox with no access to the local SQLite file), so Reviews/Global Intelligence/Digital Housekeeping pages remain empty-state until that's wired up - likely needs the hosted Postgres to be in place first, since a local-only SQLite file isn't reachable from the cloud routine either.
 
+## 2026-09-07 — First real domain interview
+
+Owner provided real content for Career (9 ranked capability priorities with specific Udemy courses), Financial (investing/forex learning), Relationships (career-driven networking), Marriage (married by 30), French (C2 by 30), Academics (university affiliation for network/positioning), plus 18 planned book purchases mapped to capabilities. Captured in `config/life_domains.yaml`, `config/goals.yaml`, and a new `config/learning_items.yaml` (course/book capability plan - didn't fit the goals table's baseline/target/progress shape).
+
+Domain weights (Career 50 / Financial 10 / Relationships 10 / French 10 / Personal 5 / Academics 5 / Spiritual 5 / Marriage 5) are a default split, NOT independently confirmed by the owner - only Career's dominance is directly evidenced by the interview. Flagged in the config file itself; revisit once confirmed.
+
+Open items the owner still needs to answer: current French level (needed to size the C2 gap), what "Personal" domain should actually contain, and what the Spiritual domain practice actually is (the owner's answer trailed off: "I love Joshua Selman so...").
+
+Added `item_type`/`priority_rank`/`priority_label` columns to `learning_items` (both `schema.sql` and `schema_sqlite.sql`, kept in sync) to hold this data. Local SQLite DB was deleted and re-seeded rather than migrated, since it held no real data yet - not a decision that would be safe once the DB holds real progress/history.
+
 ## 2026-09-07 — Security incident note
 
 A GitHub personal access token was pasted into the chat that produced this repository's scaffold. It was treated as compromised on sight, never used or written to any file, and the owner was told to revoke it immediately. `gh auth login` (device flow) is the adopted pattern for local GitHub authentication going forward, specifically to avoid ever pasting a token into a conversation again.

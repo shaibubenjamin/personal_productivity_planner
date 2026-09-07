@@ -82,13 +82,52 @@ def seed_goals(conn) -> int:
     return len(goals)
 
 
+def seed_learning_items(conn) -> int:
+    config = load_yaml("learning_items.yaml")
+    courses = config.get("courses") or []
+    books = config.get("books") or []
+    count = 0
+
+    for item_type, items in (("course", courses), ("book", books)):
+        for item in items:
+            item_id = f"{item_type}-{count}-{item['capability'][:20]}"
+            conn.execute(
+                """
+                INSERT INTO learning_items (
+                    id, domain_id, capability, course, item_type,
+                    priority_rank, priority_label, status, progress
+                ) VALUES (
+                    :id, :domain_id, :capability, :course, :item_type,
+                    :priority_rank, :priority_label, 'not_started', 0
+                )
+                ON CONFLICT(id) DO UPDATE SET
+                    domain_id=excluded.domain_id, capability=excluded.capability,
+                    course=excluded.course, priority_rank=excluded.priority_rank,
+                    priority_label=excluded.priority_label
+                """,
+                {
+                    "id": item_id,
+                    "domain_id": item["domain_id"],
+                    "capability": item["capability"],
+                    "course": item.get("course"),
+                    "item_type": item_type,
+                    "priority_rank": item.get("priority_rank"),
+                    "priority_label": item.get("priority_label"),
+                },
+            )
+            count += 1
+    conn.commit()
+    return count
+
+
 def main() -> None:
     init_db()
     conn = get_connection()
     try:
         n_domains = seed_domains(conn)
         n_goals = seed_goals(conn)
-        print(f"Seeded {n_domains} domains, {n_goals} goals.")
+        n_learning = seed_learning_items(conn)
+        print(f"Seeded {n_domains} domains, {n_goals} goals, {n_learning} learning items.")
     finally:
         conn.close()
 

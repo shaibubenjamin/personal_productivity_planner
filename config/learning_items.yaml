@@ -1,0 +1,130 @@
+# Capability development plan from the 2026-09-07 domain interview.
+# `courses`: the owner's 9 ranked career capability priorities (Udemy Business).
+# `books`: the owner's planned book purchases, each mapped to a capability/domain.
+courses:
+  - domain_id: career
+    capability: "Project Management / PMP"
+    course: "Project Management Professional (PMP) - 60 PDU PMP preparation; Introduction to PMP Exam as foundation"
+    priority_rank: 1
+    priority_label: "Critical"
+
+  - domain_id: career
+    capability: "Climate Finance"
+    course: "Sustainable, Green and Climate Finance (climate finance, green finance, blended finance, ESG, taxonomies, sustainable bonds)"
+    priority_rank: 2
+    priority_label: "Critical"
+
+  - domain_id: career
+    capability: "Financial Management for Programme Leaders"
+    course: "Financial Management for Managers / Finance for Non-Finance Managers / Financial Analysis for Managers"
+    priority_rank: 3
+    priority_label: "Critical"
+
+  - domain_id: career
+    capability: "Strategic Leadership"
+    course: "Business Management Fundamentals: Strategy & Leadership"
+    priority_rank: 4
+    priority_label: "Critical"
+
+  - domain_id: career
+    capability: "Resource Mobilisation & Blended Finance"
+    course: "The Complete Course in Blended and Sustainable Finance 2026"
+    priority_rank: 5
+    priority_label: "Critical"
+
+  - domain_id: career
+    capability: "Public Policy / Development Economics"
+    course: "Public Policy / Development Economics / Public Administration (course TBD)"
+    priority_rank: 6
+    priority_label: "Very High"
+
+  - domain_id: career
+    capability: "Monitoring, Evaluation & Results-Based Management"
+    course: "Results-Based Management, Monitoring & Evaluation; Monitoring & Evaluation for Projects and Programs; Practical Results Based Management"
+    priority_rank: 7
+    priority_label: "Very High"
+
+  - domain_id: career
+    capability: "Digital Public Infrastructure / Digital Government"
+    course: "Digital Public Infrastructure / Digital Government / Digital Transformation (course TBD)"
+    priority_rank: 8
+    priority_label: "Critical"
+
+  - domain_id: career
+    capability: "Executive Communication & Stakeholder Diplomacy"
+    course: "Stakeholder Management / Stakeholder Management for Managers / Stakeholder Management: A Toolbox for Getting Outcomes"
+    priority_rank: 9
+    priority_label: "Critical"
+
+books:
+  - domain_id: career
+    capability: "Systems thinking"
+    course: "Thinking in Systems"
+
+  - domain_id: career
+    capability: "Strategy"
+    course: "Good Strategy/Bad Strategy"
+
+  - domain_id: career
+    capability: "Executive effectiveness"
+    course: "The Effective Executive"
+
+  - domain_id: personal
+    capability: "Concentration/productivity"
+    course: "Deep Work"
+
+  - domain_id: relationships
+    capability: "Emotional/social capability"
+    course: "Emotional Intelligence"
+
+  - domain_id: career
+    capability: "Negotiation"
+    course: "Never Split the Difference"
+
+  - domain_id: relationships
+    capability: "Difficult conversations"
+    course: "Crucial Conversations"
+
+  - domain_id: career
+    capability: "Executive communication"
+    course: "The Pyramid Principle"
+
+  - domain_id: career
+    capability: "Performance/OKRs"
+    course: "Measure What Matters"
+
+  - domain_id: career
+    capability: "Operational excellence"
+    course: "The Toyota Way"
+
+  - domain_id: personal
+    capability: "Decision-making/bias"
+    course: "Thinking, Fast and Slow"
+
+  - domain_id: career
+    capability: "Institutions/development"
+    course: "Why Nations Fail"
+
+  - domain_id: career
+    capability: "Business/organisational fundamentals"
+    course: "The Personal MBA"
+
+  - domain_id: career
+    capability: "Career capital"
+    course: "So Good They Can't Ignore You"
+
+  - domain_id: personal
+    capability: "Decision principles"
+    course: "Principles: Life and Work"
+
+  - domain_id: marriage
+    capability: "Marriage"
+    course: "The Seven Principles for Making Marriage Work"
+
+  - domain_id: french
+    capability: "French"
+    course: "Let's Learn French"
+
+  - domain_id: marriage
+    capability: "Fatherhood"
+    course: "Fatherhood Principle"

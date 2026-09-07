@@ -1,25 +1,79 @@
 # Goal hierarchy: domain -> area -> objective -> key result -> project -> milestone -> task.
-# Empty template — populated once real goals are captured (blueprint task 5).
-# Schema per spec Section 4.
-goals: []
+# First real goals from the 2026-09-07 domain interview. The 9 ranked career
+# capabilities and 18 planned books live in config/learning_items.yaml instead
+# (they're capability/learning items, not goals with baseline/target/progress).
+goals:
+  - id: goal-career-capability-plan
+    domain_id: career
+    name: "Build the 9 critical/very-high career capabilities"
+    description: "Systematic capability build across PMP, climate finance, financial management for programme leaders, strategic leadership, resource mobilisation/blended finance, public policy, M&E/RBM, digital public infrastructure, executive communication - see config/learning_items.yaml for the ranked list and courses."
+    why_it_matters: "Direct build toward the stated career direction: globally trusted technical programme leader across tech/data/geospatial/AI/climate/public policy/development finance/programme management/leadership."
+    strategic_importance: 10
+    status: in_progress
+    progress: 0
+    confidence: MEDIUM
+    owner: benjaminshaibu01@gmail.com
 
-# Example shape for one goal (not real data):
-# - id: goal-001
-#   domain_id: career
-#   name: ""
-#   description: ""
-#   why_it_matters: ""
-#   strategic_importance: null      # 0-10
-#   target_date: null               # YYYY-MM-DD
-#   status: not_started             # not_started | in_progress | at_risk | done | abandoned
-#   baseline: null
-#   target: null
-#   progress: 0
-#   confidence: LOW                 # HIGH | MEDIUM | LOW
-#   dependencies: []
-#   risks: []
-#   next_action: ""
-#   review_frequency: weekly
-#   evidence: []
-#   last_reviewed: null
-#   owner: benjaminshaibu01@gmail.com
+  - id: goal-financial-investing-forex
+    domain_id: financial
+    name: "Learn investing and forex trading"
+    description: ""
+    why_it_matters: "Owner-stated financial development priority."
+    strategic_importance: 6
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "Define what 'learn' means concretely (course, paper-trading account, capital allocated) - currently just a direction, not yet a measurable goal."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-relationships-career-networking
+    domain_id: relationships
+    name: "Network effectively based on career projection"
+    description: ""
+    why_it_matters: "Owner-stated relationship priority, explicitly tied to career trajectory rather than treated as a separate social goal."
+    strategic_importance: 7
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "Define concretely: target people/organisations, cadence, or specific events/conferences to prioritise."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-marriage-by-30
+    domain_id: marriage
+    name: "Get married by age 30"
+    description: "Owner turns 29 on 2026-09-17 (per this conversation) - 'by 30' implies a target around 2027-09-17."
+    why_it_matters: "Owner-stated major life objective."
+    strategic_importance: 9
+    target_date: "2027-09-17"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "Owner asked 'what do I need to do' - needs a structured reflection covering personal/financial/emotional preparation, per spec Domain 7. Not yet broken down into concrete steps."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-french-c2-by-30
+    domain_id: french
+    name: "Reach C2 French proficiency by age 30"
+    description: "Target date ~2027-09-17 (see marriage goal note on birthday)."
+    why_it_matters: "Owner-stated long-term development objective (spec Domain 8)."
+    strategic_importance: 6
+    target_date: "2027-09-17"
+    baseline: null
+    target: "C2"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "Current level not yet given - needed to calculate the actual gap and realistic study plan."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-academics-university-affiliation
+    domain_id: academics
+    name: "Enrol in a university program with strong network/affiliation value"
+    description: "Goal is positioning for global opportunities and network, not the subject matter itself."
+    why_it_matters: "Owner-stated academic priority, explicitly connected to career strategy per spec Domain 4."
+    strategic_importance: 6
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "No specific programs/universities named yet - needs a shortlist (target institutions/programs) before this becomes actionable."
+    owner: benjaminshaibu01@gmail.com
