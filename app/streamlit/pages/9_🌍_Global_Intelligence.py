@@ -9,12 +9,14 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from app.components.style import inject_css, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Global Intelligence", layout="wide")
+st.set_page_config(page_title="PEOS - Global Intelligence", page_icon="🌍", layout="wide")
+inject_css()
 init_db()
 
-st.title("Global Intelligence")
+page_header("🌍", "Global Intelligence")
 
 conn = get_connection()
 try:
@@ -26,9 +28,9 @@ finally:
 
 if not items:
     st.info(
-        "No intelligence items stored yet — same gap as the Reviews page: the daily "
-        "routine's global-intelligence findings are delivered as part of the brief "
-        "message, not yet written back to this database."
+        "No intelligence items stored yet — same gap as Reviews: the daily "
+        "routine's findings are delivered as part of the brief message, not "
+        "yet written back to this database."
     )
 else:
     for i in items:

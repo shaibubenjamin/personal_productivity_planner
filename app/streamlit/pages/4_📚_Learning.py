@@ -9,16 +9,18 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from app.components.style import inject_css, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Learning", layout="wide")
+st.set_page_config(page_title="PEOS - Learning", page_icon="📚", layout="wide")
+inject_css()
 init_db()
 
-st.title("Learning")
-st.caption(
-    "Full learning-management engine (knowledge/skill/application/evidence/"
-    "outcome/visibility per spec Section 18) ships in V2. This page shows the "
-    "raw capability plan captured so far."
+page_header(
+    "📚",
+    "Learning",
+    "Full learning-management engine (knowledge/skill/application/evidence/outcome/"
+    "visibility per spec Section 18) ships in V2 — this shows the capability plan captured so far.",
 )
 
 conn = get_connection()
@@ -32,17 +34,23 @@ try:
 finally:
     conn.close()
 
-st.subheader(f"Career capability priorities ({len(courses)})")
+PRIORITY_COLOR = {"Critical": "#B91C1C", "Very High": "#B45309"}
+
+st.subheader(f"💼 Career capability priorities ({len(courses)})")
 for c in courses:
     with st.container(border=True):
         c1, c2 = st.columns([4, 1])
         c1.markdown(f"**{c['priority_rank']}. {c['capability']}**")
-        c2.markdown(f"`{c['priority_label']}`")
+        color = PRIORITY_COLOR.get(c["priority_label"], "#334155")
+        c2.markdown(
+            f'<span style="color:{color}; font-weight:600;">{c["priority_label"]}</span>',
+            unsafe_allow_html=True,
+        )
         st.caption(c["course"])
         st.progress(min(max(int(c["progress"] or 0), 0), 100) / 100)
 
 st.divider()
-st.subheader(f"Planned book purchases ({len(books)})")
+st.subheader(f"📖 Planned book purchases ({len(books)})")
 cols = st.columns(3)
 for i, b in enumerate(books):
     with cols[i % 3]:

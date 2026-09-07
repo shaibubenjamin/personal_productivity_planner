@@ -10,12 +10,14 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from app.components.style import domain_icon, inject_css, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Goals", layout="wide")
+st.set_page_config(page_title="PEOS - Goals", page_icon="🎯", layout="wide")
+inject_css()
 init_db()
 
-st.title("Goals")
+page_header("🎯", "Goals")
 
 conn = get_connection()
 try:
@@ -27,14 +29,14 @@ finally:
 
 domain_options = {d["name"]: d["id"] for d in domains}
 
-with st.expander("Add a goal", expanded=False):
+with st.expander("＋ Add a goal", expanded=False):
     with st.form("add_goal"):
         name = st.text_input("Goal name")
         domain_name = st.selectbox("Domain", list(domain_options.keys()) or ["(no domains configured)"])
         why = st.text_area("Why it matters")
         strategic_importance = st.slider("Strategic importance", 0, 10, 5)
         deadline = st.date_input("Target date", value=None)
-        submitted = st.form_submit_button("Add goal")
+        submitted = st.form_submit_button("Add goal", type="primary")
 
         if submitted:
             if not name or not domain_options:
@@ -69,7 +71,7 @@ conn = get_connection()
 try:
     goals = conn.execute(
         """
-        SELECT g.*, d.name AS domain_name
+        SELECT g.*, d.name AS domain_name, d.id AS domain_id
         FROM goals g JOIN domains d ON g.domain_id = d.id
         ORDER BY g.strategic_importance DESC NULLS LAST, g.created_at DESC
         """
@@ -77,14 +79,23 @@ try:
 finally:
     conn.close()
 
+STATUS_LABEL = {
+    "not_started": "Not started",
+    "in_progress": "In progress",
+    "at_risk": "At risk",
+    "done": "Done",
+    "abandoned": "Abandoned",
+}
+
 if not goals:
     st.info("No goals yet — add one above.")
 else:
     for g in goals:
         with st.container(border=True):
+            icon = domain_icon(g["domain_id"])
             c1, c2 = st.columns([4, 1])
-            c1.markdown(f"**{g['name']}**  \n_{g['domain_name']}_")
-            c2.markdown(f"Status: `{g['status']}`")
+            c1.markdown(f"**{icon} {g['name']}**  \n:gray[{g['domain_name']}]")
+            c2.markdown(f":gray[{STATUS_LABEL.get(g['status'], g['status'])}]")
             if g["why_it_matters"]:
                 st.caption(g["why_it_matters"])
             st.progress(min(max(int(g["progress"] or 0), 0), 100) / 100)
