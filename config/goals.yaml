@@ -54,16 +54,24 @@ goals:
   - id: goal-french-c2-by-30
     domain_id: french
     name: "Reach C2 French proficiency by age 30"
-    description: "Target date ~2027-09-17 (see marriage goal note on birthday)."
+    description: >
+      Baseline A1, target C2, target date 2027-09-17 (~12.3 months from
+      2026-09-07). Reality check: CEFR guidance puts A1-to-C2 at roughly
+      1000-1200 study hours; in ~12 months that is ~2.7-3.3 hours every single
+      day, which is hard to reconcile with Career at 50% of attention and 9
+      critical capabilities in flight. Milestones below sequence the levels
+      across the window on a front-loaded, intensive-but-not-fantasy pace;
+      whether C2 lands exactly by the birthday or slips to B2/C1 with C2
+      shortly after is a real risk to flag in reviews, not a promise.
     why_it_matters: "Owner-stated long-term development objective (spec Domain 8)."
     strategic_importance: 6
     target_date: "2027-09-17"
-    baseline: null
+    baseline: "A1"
     target: "C2"
-    status: not_started
+    status: in_progress
     progress: 0
     confidence: LOW
-    next_action: "Current level not yet given - needed to calculate the actual gap and realistic study plan."
+    next_action: "Milestones: A2 by 2026-11-15, B1 by 2027-02-15, B2 by 2027-05-31, C1 by 2027-08-15, C2 push in the final weeks. Daily habit stack: spaced-repetition vocab (~15-20min), grammar/structured course (~20-30min), listening immersion (~20-30min), speaking practice 2-3x/week once past A2, short daily French journaling. See chat 2026-09-07 for the full strategy."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-academics-university-affiliation
@@ -76,4 +84,30 @@ goals:
     progress: 0
     confidence: LOW
     next_action: "No specific programs/universities named yet - needs a shortlist (target institutions/programs) before this becomes actionable."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-health-habits
+    domain_id: personal
+    name: "Men's health and habit routine"
+    description: "Owner-stated scope for the Personal domain: physical health and men's habits."
+    why_it_matters: "Baseline physical/habit foundation underneath everything else - without it, the Career/French intensity above isn't sustainable."
+    strategic_importance: 5
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "No specific numeric targets given yet (workout frequency, sleep target, nutrition/grooming routine) - needs those to become trackable rather than just a general intention."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-spiritual-joshua-selman-practice
+    domain_id: spiritual
+    name: "Joshua Selman message practice + applied action items"
+    description: >
+      Rank/track Joshua Selman messages consumed, and derive concrete action
+      items from them to apply, rather than passive listening.
+    why_it_matters: "Owner-stated spiritual practice, explicitly framed around application, not just consumption."
+    strategic_importance: 5
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "Structure proposed in chat 2026-09-07 (message/date/rating/action-item log, mirroring the books table). Needs the owner's first few message titles to seed real entries instead of an empty structure."
     owner: benjaminshaibu01@gmail.com

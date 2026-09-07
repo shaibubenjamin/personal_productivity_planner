@@ -10,7 +10,7 @@ domains:
     strategic_weight: 5
     minimum_attention_pct: 5
     active: true
-    note: "Owner hasn't specified what falls under this bucket yet (health/habits/admin assumed) - unconfirmed default weight."
+    note: "Scope confirmed 2026-09-07: men's health and habits. Weight % still a default, not owner-confirmed."
 
   - id: career
     name: Career
@@ -42,7 +42,7 @@ domains:
     strategic_weight: 5
     minimum_attention_pct: 5
     active: true
-    note: "Owner's answer ('I love Joshua Selman so...') was incomplete - practice/content still needs clarifying."
+    note: "Practice confirmed 2026-09-07: rank/track Joshua Selman messages, derive applied action items from each. Weight % still a default, not owner-confirmed."
 
   - id: marriage
     name: Marriage
