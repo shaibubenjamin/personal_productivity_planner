@@ -18,6 +18,16 @@ Known gap: the routine has no GitHub repo access (same GitHub App / account-scop
 
 Notable finding from the first real run: it surfaced, unprompted, that a broad-admin-scope GitHub PAT named "New Research" was created 2026-09-06T15:18Z — flagged to the owner for verification/revocation. This is a good early sign for the "evidence over perception" principle (spec Principle 4): the system caught something the owner hadn't mentioned.
 
+## 2026-09-07 — Storage, dashboard, containerization
+
+Decided (per owner instruction, ahead of the original Supabase-first plan): use SQLite as interim storage now, migrate to Supabase/Neon Postgres later. `data/schemas/schema_sqlite.sql` mirrors `data/schemas/schema.sql` (the Postgres version) so migration later is a data-copy exercise, not a redesign.
+
+Built and verified locally (not yet exercised against Docker specifically, since Docker isn't installed on the dev machine): Streamlit dashboard, all 11 pages per spec Section 27. Dockerized per owner request ("dockerise so when I pull in future on another system, I won't have any issue") - Dockerfile + docker-compose.yml + entrypoint script, with `.gitattributes` forcing LF line endings on the shell script so a Windows checkout elsewhere can't silently break the container.
+
+Updated the daily routine to run explicit WebSearch passes for global intelligence and career opportunities (spec Sections 15-17) rather than relying on general knowledge - both are skip-if-nothing-qualifies, not padded with generic results.
+
+Known gap carried forward: the routine still can't write back to this database (it runs in an isolated cloud sandbox with no access to the local SQLite file), so Reviews/Global Intelligence/Digital Housekeeping pages remain empty-state until that's wired up - likely needs the hosted Postgres to be in place first, since a local-only SQLite file isn't reachable from the cloud routine either.
+
 ## 2026-09-07 — Security incident note
 
 A GitHub personal access token was pasted into the chat that produced this repository's scaffold. It was treated as compromised on sight, never used or written to any file, and the owner was told to revoke it immediately. `gh auth login` (device flow) is the adopted pattern for local GitHub authentication going forward, specifically to avoid ever pasting a token into a conversation again.
