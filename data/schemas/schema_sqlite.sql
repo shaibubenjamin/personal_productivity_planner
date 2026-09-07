@@ -54,6 +54,15 @@ CREATE TABLE goal_dependencies (
     PRIMARY KEY (goal_id, depends_on_goal_id)
 );
 
+CREATE TABLE goal_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    goal_id TEXT NOT NULL REFERENCES goals(id),
+    note TEXT NOT NULL,
+    status_at_time TEXT,
+    progress_at_time REAL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE goal_risks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     goal_id TEXT NOT NULL REFERENCES goals(id),
@@ -195,6 +204,8 @@ CREATE TABLE audit_log (
     reversal_method TEXT
 );
 
+CREATE INDEX idx_goal_logs_goal ON goal_logs(goal_id);
+CREATE INDEX idx_goal_logs_created ON goal_logs(created_at);
 CREATE INDEX idx_goals_domain ON goals(domain_id);
 CREATE INDEX idx_projects_domain ON projects(domain_id);
 CREATE INDEX idx_tasks_domain ON tasks(domain_id);
