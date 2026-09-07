@@ -1,0 +1,27 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.token
+credentials.json
+client_secret*.json
+token.json
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Data (real personal data stays local, never in git)
+data/*.db
+data/local/
+data/*.sqlite*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

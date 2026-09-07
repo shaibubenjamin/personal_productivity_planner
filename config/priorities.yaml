@@ -1,0 +1,24 @@
+# Priority engine weights (spec Section 5). Configurable — never hard-code in code.
+weights:
+  strategic_importance: 0.30
+  urgency: 0.20
+  strategic_value: 0.15
+  risk_of_neglect: 0.15
+  deadline_pressure: 0.10
+  dependency_criticality: 0.10
+
+modifiers:
+  # Each modifier nudges the base score; exact curves to be tuned once real data exists.
+  current_progress: enabled
+  goal_gap: enabled
+  life_domain_imbalance: enabled
+  opportunity_value: enabled
+  consequence_of_delay: enabled
+  available_time: enabled
+  energy_requirement: enabled
+  existing_commitments: enabled
+
+daily_task_limit:
+  must_do_max: 3
+  should_do_max: null   # uncapped but should stay small
+  could_do_max: null

@@ -1,0 +1,10 @@
+# Review cadence (spec Sections 10, 22-24).
+daily:
+  analysis_time: "04:00"
+  timezone: null   # TODO: confirm owner's timezone
+weekly:
+  day: monday
+monthly:
+  day_of_month: last
+quarterly:
+  months: [3, 6, 9, 12]

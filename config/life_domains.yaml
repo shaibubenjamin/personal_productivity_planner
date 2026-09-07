@@ -1,0 +1,52 @@
+# Life domains and their strategic weights / minimum-attention thresholds.
+# These values are PLACEHOLDERS from the spec's worked example — not yet reviewed
+# with the user. Task: replace via a domain-by-domain interview (blueprint task 5).
+domains:
+  - id: personal
+    name: Personal
+    strategic_weight: null       # placeholder — needs owner input
+    minimum_attention_pct: null
+    active: true
+
+  - id: career
+    name: Career
+    strategic_weight: null
+    minimum_attention_pct: 50    # example value from spec, unconfirmed
+    active: true
+
+  - id: financial
+    name: Financial
+    strategic_weight: null
+    minimum_attention_pct: 10    # example value from spec, unconfirmed
+    active: true
+
+  - id: academics
+    name: Academics
+    strategic_weight: null
+    minimum_attention_pct: null
+    active: true
+
+  - id: relationships
+    name: Relationships
+    strategic_weight: null
+    minimum_attention_pct: 10    # example value from spec, unconfirmed
+    active: true
+
+  - id: spiritual
+    name: Spiritual
+    strategic_weight: null
+    minimum_attention_pct: null
+    active: true
+
+  - id: marriage
+    name: Marriage
+    strategic_weight: null
+    minimum_attention_pct: null
+    active: true
+    note: "Treated as distinct from the broader Relationships domain per spec Domain 7."
+
+  - id: french
+    name: French
+    strategic_weight: null
+    minimum_attention_pct: 10    # example value from spec, unconfirmed
+    active: true

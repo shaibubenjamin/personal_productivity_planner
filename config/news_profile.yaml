@@ -1,0 +1,12 @@
+# Global intelligence topics (spec Section 16). Used to filter WebSearch results
+# before anything reaches the daily brief.
+topics:
+  climate: [climate adaptation, climate resilience, climate risk, climate policy, climate finance]
+  energy: [renewable energy, electricity access, mini-grids, energy policy, energy finance, distributed energy]
+  development_finance: [World Bank, AfDB, IFC, development finance, blended finance, grants, investment]
+  technology: [AI, data platforms, geospatial, digital public infrastructure, digital government]
+  public_policy: [Nigeria, Africa, development policy, governance, economic policy]
+  professional_development: [programme management, leadership, M&E, results-based financing, executive communication]
+
+relevance_threshold: 0.6   # 0-1, tune after a couple weeks of accept/reject feedback
+max_items_per_brief: 10

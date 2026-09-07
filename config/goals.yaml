@@ -1,0 +1,25 @@
+# Goal hierarchy: domain -> area -> objective -> key result -> project -> milestone -> task.
+# Empty template — populated once real goals are captured (blueprint task 5).
+# Schema per spec Section 4.
+goals: []
+
+# Example shape for one goal (not real data):
+# - id: goal-001
+#   domain_id: career
+#   name: ""
+#   description: ""
+#   why_it_matters: ""
+#   strategic_importance: null      # 0-10
+#   target_date: null               # YYYY-MM-DD
+#   status: not_started             # not_started | in_progress | at_risk | done | abandoned
+#   baseline: null
+#   target: null
+#   progress: 0
+#   confidence: LOW                 # HIGH | MEDIUM | LOW
+#   dependencies: []
+#   risks: []
+#   next_action: ""
+#   review_frequency: weekly
+#   evidence: []
+#   last_reviewed: null
+#   owner: benjaminshaibu01@gmail.com

@@ -1,0 +1,44 @@
+# Automation categories (spec Section 29). This file is the enforcement point —
+# engine code must check this, not hard-code approval behavior.
+
+category_a_automatic:
+  - read_calendar
+  - analyze_calendar
+  - read_emails
+  - classify_emails
+  - analyze_goals
+  - generate_reports
+  - search_relevant_news
+  - calculate_priority
+  - identify_duplicates
+  - generate_recommendations
+
+category_b_auto_after_confidence:
+  enabled: false   # stays false until trust_graduation criteria (below) are met
+  actions:
+    - archive_obvious_newsletters
+    - apply_labels
+    - create_low_risk_reminders
+    - generate_routine_calendar_blocks
+    - organize_low_risk_documents
+  execution_mode: batched_morning_approval   # never silent, even once enabled
+
+category_c_human_approval_required:
+  actions:
+    - delete_emails
+    - delete_drive_files
+    - send_important_emails
+    - reply_to_sensitive_messages
+    - move_important_meetings
+    - cancel_meetings
+    - major_financial_actions
+    - relationship_sensitive_communications
+    - external_commitments
+    - irreversible_actions
+  execution_mode: per_action_approval   # always, no batching
+
+trust_graduation:
+  min_consecutive_days_clean: 14
+  criteria:
+    - zero_safety_test_failures
+    - zero_rejected_category_a_outputs
