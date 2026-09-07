@@ -1,5 +1,7 @@
 # Personal Executive Operating System (PEOS)
 
+_Repository: `personal_productivity_planner`_
+
 A personal Chief-of-Staff / strategic-planning / life-balance system. Not a task manager.
 
 This repository is private. It will eventually hold configuration and (synthetic/redacted) fixtures spanning career, financial, relationship, marriage, and other personal domains — never real credentials, and real personal data only in the local, gitignored `data/` working files, not in commits.
