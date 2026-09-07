@@ -38,6 +38,25 @@ Open items the owner still needs to answer: current French level (needed to size
 
 Added `item_type`/`priority_rank`/`priority_label` columns to `learning_items` (both `schema.sql` and `schema_sqlite.sql`, kept in sync) to hold this data. Local SQLite DB was deleted and re-seeded rather than migrated, since it held no real data yet - not a decision that would be safe once the DB holds real progress/history.
 
+## 2026-09-07 — Weekly review email + meeting (owner-approved Category C exception)
+
+Owner asked for: to-dos on calendar, reminder emails on what to do, missed-deadline flags, and feedback emails with a meeting set up to review them. Implemented as:
+
+- One-time setup (already run, confirmed success): recurring "PEOS Weekly Review Meeting", Sundays 19:30-20:00 Africa/Lagos, self-only.
+- New recurring routine `PEOS Weekly Review Email` (`trig_017i8867KBQ9xkcBUaxd6JLv`), Sundays 19:00 Africa/Lagos (18:00 UTC / `0 18 * * 0`): reads the last 7 days of Calendar as adherence evidence, checks known deadlines against today's date, and **emails** benjaminshaibu01@gmail.com (only) with to-dos, upcoming/passed deadlines, and feedback - 30 minutes before the review meeting.
+
+This is a real, narrow exception to Category C (`send_important_emails` normally requires per-action approval) - recorded in `config/automation_policy.yaml` under `category_c_owner_approved_exceptions`, not a general bypass. Scoped to: self as the only recipient, ever; revocable by removing the config entry.
+
+**Known limitation, same root cause as the daily brief:** this routine has no repository or database access (GitHub App permission issue, still open), so the goals/deadlines it emails about are inlined text in its prompt as of 2026-09-07, not a live read of `config/goals.yaml`. It will silently go stale the moment goals.yaml changes without the routine's prompt being updated to match. Fixing the GitHub App access (or standing up the Postgres DB so a routine could query it directly) removes this whole class of staleness - flagged as the top follow-up before this scales further.
+
+## 2026-09-07 — "V2" scope reality check
+
+Owner asked to "finalize all that needs to be shipped in version 2." Being direct about what that does and doesn't mean right now, rather than claiming a false completeness:
+
+**What's real and shipped:** every domain's Streamlit page now shows actual owner data where that data exists (Career/Learning capability plan, French milestones, Goals list across all 8 domains) instead of a placeholder. The weekly email/meeting loop above is a real, working piece of the Weekly Executive Review (spec Section 22).
+
+**What is NOT built, and calling it "shipped" would be fake precision (spec Section 54 forbids exactly this):** the adaptive algorithmic pieces the spec's V2 list actually implies - a Career capability engine that tracks knowledge/skill/application/evidence/outcome/visibility per goal (Section 18) rather than just listing courses; a real Financial engine (cash flow, savings tracking); a Relationship/marriage engine beyond a single goal row; Meeting Intelligence (pre/post-meeting prep and extraction); Advanced Pattern Detection (Section 21); a Learning engine that tracks application/evidence, not just course status. These need iterative design against real usage data (which barely exists yet - the system is one day old) - building them now would mean inventing behavior with nothing real to calibrate against, which is the "half-finished implementation for its own sake" failure mode, not genuine V2 delivery. Recommend letting V1 run for real weeks before investing here, per the spec's own phased-trust principle.
+
 ## 2026-09-07 — Security incident note
 
 A GitHub personal access token was pasted into the chat that produced this repository's scaffold. It was treated as compromised on sight, never used or written to any file, and the owner was told to revoke it immediately. `gh auth login` (device flow) is the adopted pattern for local GitHub authentication going forward, specifically to avoid ever pasting a token into a conversation again.

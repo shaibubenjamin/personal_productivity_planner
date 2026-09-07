@@ -23,6 +23,18 @@ category_b_auto_after_confidence:
     - organize_low_risk_documents
   execution_mode: batched_morning_approval   # never silent, even once enabled
 
+category_c_owner_approved_exceptions:
+  # Standing, narrowly-scoped exceptions the owner explicitly approved on
+  # 2026-09-07 - NOT a general bypass of category C. Each is self-addressed
+  # / self-only, recurring, and was approved as a class of action, not
+  # rubber-stamped case by case. Revoke by removing the entry here.
+  - action: send_weekly_review_email
+    scope: "To benjaminshaibu01@gmail.com ONLY - never any other recipient."
+    routine: "PEOS Weekly Review Email (trig_017i8867KBQ9xkcBUaxd6JLv)"
+  - action: create_recurring_self_calendar_events
+    scope: "Self-only events (no other attendees) for study/reflection/review blocks the owner explicitly requested."
+    note: "One-time setup tasks, not the daily/weekly unattended routines - each new recurring block still needs an explicit ask."
+
 category_c_human_approval_required:
   actions:
     - delete_emails
