@@ -81,14 +81,20 @@ CREATE TABLE projects (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- project_id/goal_id are both nullable: a task can hang directly off a goal
+-- (the common case right now, since most goals have no project yet) or off
+-- a project once that layer is actually populated.
 CREATE TABLE tasks (
     id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL REFERENCES projects(id),
+    project_id TEXT REFERENCES projects(id),
+    goal_id TEXT REFERENCES goals(id),
     domain_id TEXT NOT NULL REFERENCES domains(id),
     title TEXT NOT NULL,
+    notes TEXT,
     priority REAL,
     deadline TEXT,
-    status TEXT NOT NULL DEFAULT 'not_started',
+    status TEXT NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started','in_progress','done')),
+    completed_at TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -207,6 +213,7 @@ CREATE TABLE audit_log (
 CREATE INDEX idx_goal_logs_goal ON goal_logs(goal_id);
 CREATE INDEX idx_goal_logs_created ON goal_logs(created_at);
 CREATE INDEX idx_goals_domain ON goals(domain_id);
+CREATE INDEX idx_tasks_goal ON tasks(goal_id);
 CREATE INDEX idx_projects_domain ON projects(domain_id);
 CREATE INDEX idx_tasks_domain ON tasks(domain_id);
 CREATE INDEX idx_calendar_events_domain ON calendar_events(domain_id);

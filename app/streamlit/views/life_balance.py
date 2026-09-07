@@ -1,4 +1,4 @@
-"""PEOS - Page 2: Life Balance (spec Section 27, Page 2 / Section 6 engine)."""
+"""PEOS - Life Balance (spec Section 27, Page 2 / Section 6 engine)."""
 
 import sys
 from pathlib import Path
@@ -9,16 +9,14 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import domain_icon, inject_css, page_header, status_pill  # noqa: E402
+from app.components.style import domain_icon, icon_md, page_header, status_pill  # noqa: E402
 from engine.balance.balance import BalanceStatus, DomainAttention, assess_life_balance  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Life Balance", page_icon="⚖️", layout="wide")
-inject_css()
 init_db()
 
 page_header(
-    "⚖️",
+    "balance",
     "Life Balance",
     "OVER / UNDER / HEALTHY per domain — no composite \"life score\" by design.",
 )
@@ -64,5 +62,11 @@ if configured:
             with st.container(border=True):
                 icon = domain_icon(domain_id)
                 c1, c2 = st.columns([3, 2])
-                c1.markdown(f"### {icon} {id_to_name[domain_id]}")
+                c1.markdown(f"### {icon_md(icon)} {id_to_name[domain_id]}")
                 c2.markdown(status_pill(status.value.replace("_", " "), status.value), unsafe_allow_html=True)
+                st.page_link(
+                    "views/domain_detail.py",
+                    label="View goals & to-dos",
+                    icon=":material/arrow_forward:",
+                    query_params={"domain": domain_id},
+                )

@@ -1,21 +1,22 @@
 """Shared design system for the PEOS Streamlit app.
 
 One place for colors, icons, and small styled components so every page
-looks like it belongs to the same product instead of 11 pages each
-improvising their own layout.
+looks like it belongs to the same product instead of improvising its own
+layout. Icons are Material Symbols (clean monochrome line icons, built into
+Streamlit's ":material/name:" markdown shorthand) - not emoji.
 """
 
 import streamlit as st
 
 DOMAIN_ICONS = {
-    "career": "💼",
-    "financial": "💰",
-    "relationships": "🤝",
-    "marriage": "💞",
-    "french": "🇫🇷",
-    "academics": "🎓",
-    "spiritual": "🙏",
-    "personal": "🧑",
+    "career": "work",
+    "financial": "payments",
+    "relationships": "handshake",
+    "marriage": "favorite",
+    "french": "translate",
+    "academics": "school",
+    "spiritual": "self_improvement",
+    "personal": "person",
 }
 
 STATUS_COLORS = {
@@ -35,9 +36,8 @@ def inject_css() -> None:
         h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
         [data-testid="stMetricValue"] { font-size: 1.4rem; }
         [data-testid="stMetricLabel"] { color: #64748B; font-size: 0.85rem; }
-        .peos-header { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.1rem; }
-        .peos-header .icon { font-size: 1.8rem; }
-        .peos-subtitle { color: #64748B; font-size: 0.95rem; margin-top: -0.3rem; margin-bottom: 1.4rem; }
+        .peos-header h1 { margin-bottom: 0; }
+        .peos-subtitle { color: #64748B; font-size: 0.95rem; margin-top: 0.1rem; margin-bottom: 1.4rem; }
         .peos-pill {
             display: inline-block; padding: 0.15rem 0.65rem; border-radius: 999px;
             font-size: 0.78rem; font-weight: 600; white-space: nowrap;
@@ -48,11 +48,15 @@ def inject_css() -> None:
     )
 
 
+def icon_md(name: str) -> str:
+    """Material Symbols markdown shorthand, e.g. icon_md('work') -> ':material/work:'."""
+    return f":material/{name}:"
+
+
 def page_header(icon: str, title: str, subtitle: str = "") -> None:
-    st.markdown(
-        f'<div class="peos-header"><span class="icon">{icon}</span><h1>{title}</h1></div>',
-        unsafe_allow_html=True,
-    )
+    st.markdown(f'<div class="peos-header">', unsafe_allow_html=True)
+    st.markdown(f"# {icon_md(icon)} {title}")
+    st.markdown("</div>", unsafe_allow_html=True)
     if subtitle:
         st.markdown(f'<div class="peos-subtitle">{subtitle}</div>', unsafe_allow_html=True)
 
@@ -66,4 +70,4 @@ def status_pill(label: str, status_key: str) -> str:
 
 
 def domain_icon(domain_id: str) -> str:
-    return DOMAIN_ICONS.get(domain_id, "•")
+    return DOMAIN_ICONS.get(domain_id, "circle")

@@ -1,4 +1,4 @@
-"""PEOS - Page 11: Digital Housekeeping (spec Section 27, Page 11)."""
+"""PEOS - Digital Housekeeping (spec Section 27, Page 11)."""
 
 import sys
 from pathlib import Path
@@ -9,14 +9,12 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import inject_css, page_header  # noqa: E402
+from app.components.style import page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Digital Housekeeping", page_icon="🧹", layout="wide")
-inject_css()
 init_db()
 
-page_header("🧹", "Digital Housekeeping")
+page_header("cleaning_services", "Digital Housekeeping")
 
 conn = get_connection()
 try:
@@ -29,7 +27,7 @@ try:
 finally:
     conn.close()
 
-tab1, tab2 = st.tabs(["📧 Gmail", "🗂️ Drive"])
+tab1, tab2 = st.tabs(["Gmail", "Drive"])
 
 with tab1:
     st.metric("Unprocessed emails in review queue", emails)

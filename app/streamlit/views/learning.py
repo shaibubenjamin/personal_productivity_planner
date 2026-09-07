@@ -1,4 +1,4 @@
-"""PEOS - Page 5: Learning (spec Section 27, Page 5)."""
+"""PEOS - Learning (spec Section 27, Page 5)."""
 
 import sys
 from pathlib import Path
@@ -9,15 +9,13 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import inject_css, page_header  # noqa: E402
+from app.components.style import page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Learning", page_icon="📚", layout="wide")
-inject_css()
 init_db()
 
 page_header(
-    "📚",
+    "school",
     "Learning",
     "Full learning-management engine (knowledge/skill/application/evidence/outcome/"
     "visibility per spec Section 18) ships in V2 — this shows the capability plan captured so far.",
@@ -36,7 +34,7 @@ finally:
 
 PRIORITY_COLOR = {"Critical": "#B91C1C", "Very High": "#B45309"}
 
-st.subheader(f"💼 Career capability priorities ({len(courses)})")
+st.subheader(f"Career capability priorities ({len(courses)})")
 for c in courses:
     with st.container(border=True):
         c1, c2 = st.columns([4, 1])
@@ -50,7 +48,7 @@ for c in courses:
         st.progress(min(max(int(c["progress"] or 0), 0), 100) / 100)
 
 st.divider()
-st.subheader(f"📖 Planned book purchases ({len(books)})")
+st.subheader(f"Planned book purchases ({len(books)})")
 cols = st.columns(3)
 for i, b in enumerate(books):
     with cols[i % 3]:

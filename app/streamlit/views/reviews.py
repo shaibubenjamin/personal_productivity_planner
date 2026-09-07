@@ -1,6 +1,6 @@
-"""PEOS - Page 9: Reviews (spec Section 27, Page 9).
+"""PEOS - Reviews (spec Section 27, Page 9).
 
-The "cloud routine" reviews (daily/weekly brief) can't persist here yet (see
+The cloud routine reviews (daily/weekly brief) can't persist here yet (see
 docs/decision_log.md), but weekly progress against goal logs is entirely
 local data - computed for real, not a placeholder.
 """
@@ -15,15 +15,13 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import domain_icon, inject_css, page_header  # noqa: E402
+from app.components.style import domain_icon, icon_md, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 from engine.reviews.weekly_progress import ProgressCategory, classify_goal  # noqa: E402
 
-st.set_page_config(page_title="PEOS - Reviews", page_icon="📝", layout="wide")
-inject_css()
 init_db()
 
-page_header("📝", "Reviews")
+page_header("fact_check", "Reviews")
 
 st.subheader("This Week's Progress")
 st.caption(
@@ -56,30 +54,30 @@ for g in goals:
     buckets[category].append(g)
 
 SECTION_META = {
-    ProgressCategory.ON_TRACK: ("✅ Going Fine", "#15803D"),
-    ProgressCategory.STRUGGLING: ("⚠️ Struggling", "#B91C1C"),
-    ProgressCategory.REMAINING: ("⏳ Left To Start", "#B45309"),
-    ProgressCategory.COMPLETED: ("🎉 Completed", "#4F46E5"),
-    ProgressCategory.ABANDONED: ("🗑️ Abandoned", "#64748B"),
+    ProgressCategory.ON_TRACK: ("Going Fine", "check_circle", "#15803D"),
+    ProgressCategory.STRUGGLING: ("Struggling", "warning", "#B91C1C"),
+    ProgressCategory.REMAINING: ("Left To Start", "hourglass_empty", "#B45309"),
+    ProgressCategory.COMPLETED: ("Completed", "celebration", "#4F46E5"),
+    ProgressCategory.ABANDONED: ("Abandoned", "delete", "#64748B"),
 }
 
 cols = st.columns(len(SECTION_META))
-for col, (category, (label, color)) in zip(cols, SECTION_META.items()):
-    col.markdown(f'<span style="color:{color}; font-weight:600;">{label}</span>', unsafe_allow_html=True)
+for col, (category, (label, icon, color)) in zip(cols, SECTION_META.items()):
+    col.markdown(f'<span style="color:{color}; font-weight:600;">{icon_md(icon)} {label}</span>', unsafe_allow_html=True)
     col.metric("", len(buckets[category]))
 
 st.divider()
 
-for category, (label, color) in SECTION_META.items():
+for category, (label, icon, color) in SECTION_META.items():
     items = buckets[category]
     if not items:
         continue
-    st.markdown(f'### <span style="color:{color};">{label}</span>', unsafe_allow_html=True)
+    st.markdown(f'### <span style="color:{color};">{icon_md(icon)} {label}</span>', unsafe_allow_html=True)
     for g in items:
-        icon = domain_icon(g["domain_id"])
+        d_icon = domain_icon(g["domain_id"])
         with st.container(border=True):
             c1, c2 = st.columns([4, 1])
-            c1.markdown(f"**{icon} {g['name']}**  \n:gray[{g['domain_name']}]")
+            c1.markdown(f"**{icon_md(d_icon)} {g['name']}**  \n:gray[{g['domain_name']}]")
             c2.markdown(f"{int(g['progress'] or 0)}%")
     st.write("")
 
