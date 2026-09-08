@@ -19,6 +19,61 @@ except ImportError:
 
 SESSION_KEY = "peos_authenticated"
 
+# The one quote the owner explicitly required (2026-09-08) is first and
+# fixed. The rest are additional widely-circulated Hormozi quotes - if any
+# wording is off from the exact verbatim source, swap it out; better to
+# under-quote a real person than risk misattributing invented words to them.
+MOTIVATION_QUOTES = [
+    "Do so much work, it's impossible not to achieve your dream.",
+    "Don't wish it were easier, wish you were better.",
+    "The obstacle in the path becomes the path. Never forget, within every obstacle is an opportunity to improve our condition.",
+    "Volume negates luck.",
+    "Skills are more valuable than money, because skills can get you money, but money can't buy skills.",
+]
+
+
+def _login_chrome() -> None:
+    """Nature-inspired animated background + rotating quote, login screen only."""
+    quotes_js = ",".join(f'"{q}"' for q in MOTIVATION_QUOTES)
+    st.markdown(
+        f"""
+        <style>
+        .peos-login-bg {{
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: linear-gradient(-45deg, #0f3d2e, #1a5c42, #2d7a52, #0a2e42, #14532d);
+            background-size: 400% 400%;
+            animation: peosGradient 18s ease infinite;
+        }}
+        @keyframes peosGradient {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+        .peos-login-quote {{
+            color: #ECFDF5; font-size: 1.1rem; font-style: italic; text-align: center;
+            min-height: 4.5rem; padding: 1rem 1.5rem; margin-bottom: 1rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        }}
+        [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{ background: transparent; }}
+        </style>
+        <div class="peos-login-bg"></div>
+        <div class="peos-login-quote" id="peos-quote"></div>
+        <script>
+        const peosQuotes = [{quotes_js}];
+        let peosQuoteIndex = 0;
+        function peosRotateQuote() {{
+            const el = document.getElementById("peos-quote");
+            if (el) {{ el.textContent = peosQuotes[peosQuoteIndex % peosQuotes.length]; }}
+            peosQuoteIndex++;
+        }}
+        peosRotateQuote();
+        setInterval(peosRotateQuote, 10000);
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 def _get_secret(key: str) -> str | None:
     if hasattr(st, "secrets"):
@@ -39,6 +94,7 @@ def require_login() -> bool:
     salt = _get_secret("PEOS_AUTH_PASSWORD_SALT")
     pw_hash = _get_secret("PEOS_AUTH_PASSWORD_HASH")
 
+    _login_chrome()
     st.title("PEOS")
     st.caption("Personal Executive Operating System")
 
