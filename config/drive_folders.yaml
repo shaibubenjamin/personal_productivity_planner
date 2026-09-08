@@ -1,0 +1,27 @@
+# Google Drive folder IDs created 2026-09-08 as the shared bridge between
+# the cloud routines (which have Drive access but no DB access) and
+# everything else. See docs/decision_log.md for why this exists.
+root:
+  name: PEOS
+  id: 1DIY-Far6kEgnrjlSIOX6Eu4lm3fHyTSx
+  url: https://drive.google.com/drive/folders/1DIY-Far6kEgnrjlSIOX6Eu4lm3fHyTSx
+
+subfolders:
+  daily_briefs:
+    name: Daily Briefs
+    id: 1-g2uuOcfnwmJbCAPIOJVFCZEAbiyQIAH
+  weekly_reviews:
+    name: Weekly Reviews
+    id: 1bmDLJNL3wWXRh06CgEJLTBKd0vQZrOjk
+  global_intelligence:
+    name: Global Intelligence
+    id: 1pTTSHuLF3ufSkMd8cPAfASsd2R2MO_UE
+  learning:
+    name: Learning
+    id: 10KOYHjSub0FrO4bgUIs_v0Z6M1xY8I0v
+  digital_housekeeping:
+    name: Digital Housekeeping
+    id: 1Og9DKw1rAbCBlRYg-gICnDMjmx5iInoz
+  logs:
+    name: Logs
+    id: 134mf5U4yqACZRMtAnzxyiutlepxyXrdL

@@ -9,7 +9,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import domain_icon, icon_md, page_header, status_pill  # noqa: E402
+from app.components.domain_card import render_domain_card  # noqa: E402
+from app.components.style import page_header, status_pill  # noqa: E402
 from engine.balance.balance import BalanceStatus, DomainAttention, assess_life_balance  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
@@ -55,18 +56,9 @@ if configured:
     ]
     results = assess_life_balance(attentions)
 
-    id_to_name = {d["id"]: d["name"] for d in domains}
+    by_id = {d["id"]: d for d in configured}
     cols = st.columns(2)
     for i, (domain_id, status) in enumerate(results.items()):
+        badge = status_pill(status.value.replace("_", " "), status.value)
         with cols[i % 2]:
-            with st.container(border=True):
-                icon = domain_icon(domain_id)
-                c1, c2 = st.columns([3, 2])
-                c1.markdown(f"### {icon_md(icon)} {id_to_name[domain_id]}")
-                c2.markdown(status_pill(status.value.replace("_", " "), status.value), unsafe_allow_html=True)
-                st.page_link(
-                    "views/domain_detail.py",
-                    label="View goals & to-dos",
-                    icon=":material/arrow_forward:",
-                    query_params={"domain": domain_id},
-                )
+            render_domain_card(by_id[domain_id], badge_html=badge)

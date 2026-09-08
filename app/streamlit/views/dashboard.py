@@ -13,7 +13,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import domain_icon, icon_md, page_header  # noqa: E402
+from app.components.domain_card import render_domain_card  # noqa: E402
+from app.components.style import page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 init_db()
@@ -49,21 +50,8 @@ if not domains:
 else:
     cols = st.columns(2)
     for i, d in enumerate(domains):
-        weight = d["strategic_weight"]
-        min_attn = d["minimum_attention_pct"]
         with cols[i % 2]:
-            with st.container(border=True):
-                icon = domain_icon(d["id"])
-                st.markdown(f"#### {icon_md(icon)} {d['name']}")
-                c1, c2 = st.columns(2)
-                c1.metric("Strategic weight", f"{weight:.0f}%" if weight is not None else "—")
-                c2.metric("Min. attention", f"{min_attn:.0f}%" if min_attn is not None else "—")
-                st.page_link(
-                    "views/domain_detail.py",
-                    label="View goals & to-dos",
-                    icon=":material/arrow_forward:",
-                    query_params={"domain": d["id"]},
-                )
+            render_domain_card(d)
 
 st.divider()
 st.caption(

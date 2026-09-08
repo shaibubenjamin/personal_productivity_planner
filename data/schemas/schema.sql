@@ -158,10 +158,19 @@ CREATE TABLE learning_items (
     item_type TEXT NOT NULL DEFAULT 'course' CHECK (item_type IN ('course','book')),
     priority_rank INTEGER,
     priority_label TEXT,
-    status TEXT NOT NULL DEFAULT 'not_started',
+    status TEXT NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started','in_progress','done')),
     progress NUMERIC NOT NULL DEFAULT 0,
+    notes TEXT,
+    completed_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE learning_item_logs (
+    id SERIAL PRIMARY KEY,
+    learning_item_id TEXT NOT NULL REFERENCES learning_items(id),
+    note TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE reviews (
@@ -177,12 +186,29 @@ CREATE TABLE intelligence_items (
     id TEXT PRIMARY KEY,
     source TEXT NOT NULL,
     title TEXT NOT NULL,
+    url TEXT,
+    category TEXT NOT NULL DEFAULT 'other' CHECK (category IN ('politics','opportunity','other')),
     topic TEXT,
     relevance NUMERIC,
     actionability NUMERIC,
     confidence confidence_level NOT NULL DEFAULT 'MEDIUM',
     feedback TEXT,                 -- accepted/rejected, used to tune relevance_threshold
+    status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new','reviewed','actioned')),
+    action_taken TEXT,
     item_date DATE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- What the owner did with a system-generated communication (weekly review
+-- email, daily brief, etc.) - answers "have I read this, what did I do".
+CREATE TABLE claude_outputs (
+    id TEXT PRIMARY KEY,
+    output_type TEXT NOT NULL,
+    subject TEXT,
+    summary TEXT,
+    reviewed BOOLEAN NOT NULL DEFAULT FALSE,
+    action_taken TEXT,
+    sent_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

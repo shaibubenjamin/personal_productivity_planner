@@ -155,10 +155,19 @@ CREATE TABLE learning_items (
     item_type TEXT NOT NULL DEFAULT 'course' CHECK (item_type IN ('course','book')),
     priority_rank INTEGER,
     priority_label TEXT,
-    status TEXT NOT NULL DEFAULT 'not_started',
+    status TEXT NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started','in_progress','done')),
     progress REAL NOT NULL DEFAULT 0,
+    notes TEXT,
+    completed_at TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE learning_item_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    learning_item_id TEXT NOT NULL REFERENCES learning_items(id),
+    note TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE reviews (
@@ -174,12 +183,29 @@ CREATE TABLE intelligence_items (
     id TEXT PRIMARY KEY,
     source TEXT NOT NULL,
     title TEXT NOT NULL,
+    url TEXT,
+    category TEXT NOT NULL DEFAULT 'other' CHECK (category IN ('politics','opportunity','other')),
     topic TEXT,
     relevance REAL,
     actionability REAL,
     confidence TEXT NOT NULL DEFAULT 'MEDIUM' CHECK (confidence IN ('HIGH','MEDIUM','LOW')),
     feedback TEXT,
+    status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new','reviewed','actioned')),
+    action_taken TEXT,
     item_date TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- What the owner did with a system-generated communication (weekly review
+-- email, daily brief, etc.) - answers "have I read this, what did I do".
+CREATE TABLE claude_outputs (
+    id TEXT PRIMARY KEY,
+    output_type TEXT NOT NULL,
+    subject TEXT,
+    summary TEXT,
+    reviewed INTEGER NOT NULL DEFAULT 0,
+    action_taken TEXT,
+    sent_at TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

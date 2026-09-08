@@ -34,6 +34,9 @@ category_c_owner_approved_exceptions:
   - action: create_recurring_self_calendar_events
     scope: "Self-only events (no other attendees) for study/reflection/review blocks the owner explicitly requested."
     note: "One-time setup tasks, not the daily/weekly unattended routines - each new recurring block still needs an explicit ask."
+  - action: create_drive_docs_in_peos_folder
+    scope: "Create-only (never move/delete/rename existing files), and only inside the PEOS/ folder tree (root id 1DIY-Far6kEgnrjlSIOX6Eu4lm3fHyTSx) created 2026-09-08: Daily Briefs, Weekly Reviews, Global Intelligence, Learning, Digital Housekeeping, Logs."
+    routine: "PEOS 4 AM Executive Brief (writes to Daily Briefs/), PEOS Weekly Review Email (writes to Weekly Reviews/)"
 
 category_c_human_approval_required:
   actions:
