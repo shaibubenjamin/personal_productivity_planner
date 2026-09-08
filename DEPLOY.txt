@@ -1,0 +1,70 @@
+PEOS - STREAMLIT COMMUNITY CLOUD DEPLOYMENT GUIDE
+==================================================
+
+This app cannot be deployed by Claude directly - Streamlit Community Cloud
+deployment requires a browser login (share.streamlit.io, sign in with
+GitHub), and no browser tool exists in that session. Follow these steps
+yourself; they take about 5 minutes.
+
+WHAT'S ALREADY IN PLACE
+------------------------
+- requirements.txt (repo root) - Streamlit Cloud auto-installs from this.
+- .streamlit/config.toml - theme, already committed.
+- app/streamlit/Home.py - the entrypoint file you'll point Streamlit Cloud at.
+
+STEPS
+-----
+1. Go to https://share.streamlit.io and sign in with your GitHub account
+   (the one that owns shaibubenjamin/personal_productivity_planner).
+
+2. Click "New app" (or "Create app").
+
+3. Fill in:
+   - Repository: shaibubenjamin/personal_productivity_planner
+   - Branch: production   (main also works - they're kept in sync)
+   - Main file path: app/streamlit/Home.py
+
+4. Click "Advanced settings" BEFORE deploying, and paste this into the
+   Secrets box (TOML format). Do NOT commit these values anywhere - this
+   secrets box is the only place they should live for the deployed app:
+
+   PEOS_AUTH_USERNAME = "benjaminshaibu01@gmail.com"
+   PEOS_AUTH_PASSWORD_SALT = "<copy from your local .env>"
+   PEOS_AUTH_PASSWORD_HASH = "<copy from your local .env>"
+
+   Get those two values from the PEOS_AUTH_PASSWORD_SALT and
+   PEOS_AUTH_PASSWORD_HASH lines in your local .env file (repo root,
+   gitignored, not something Claude can read out to you here since it's
+   a secret - open it yourself in a text editor).
+
+5. Click "Deploy". First build takes a minute or two.
+
+6. Log in at the deployed URL with the same username/password as your
+   local app (from LOGIN_PASSWORD_READ_ME_THEN_DELETE.txt, if you haven't
+   deleted it yet - the password itself, not the hash/salt, goes in your
+   browser login form, not in the secrets box above).
+
+IMPORTANT - READ BEFORE RELYING ON THE DEPLOYED APP
+----------------------------------------------------
+Streamlit Community Cloud's storage is EPHEMERAL. This app currently
+stores everything in a local SQLite file (data/local/peos.db), which is
+gitignored and does NOT get deployed with the code. That means:
+
+  - The deployed app starts with an EMPTY database (freshly re-seeded from
+    config/*.yaml on first run - domains, goals, learning items, French
+    course modules - but none of your logged progress, to-dos you've
+    ticked, or feedback entries).
+  - Any redeploy, restart, or the app going to sleep from inactivity can
+    WIPE whatever you entered in the deployed version.
+  - Your LOCAL app (data/local/peos.db on this machine) is unaffected -
+    the two are separate databases once deployed.
+
+Bottom line: treat the deployed version as a preview/mobile-access
+convenience for now, not the source of truth, until the Postgres/Supabase
+migration (already planned - see docs/decision_log.md) replaces local
+SQLite with a database both the local and deployed app actually share.
+
+OPTIONAL - custom subdomain
+----------------------------
+Streamlit Cloud lets you pick the *.streamlit.app subdomain during setup
+(e.g. peos-benjamin.streamlit.app) if you want something memorable.
