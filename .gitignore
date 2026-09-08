@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+LOGIN_PASSWORD_READ_ME_THEN_DELETE.txt
 *.token
 credentials.json
 client_secret*.json

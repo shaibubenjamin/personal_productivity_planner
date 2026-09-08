@@ -98,6 +98,17 @@ goals:
     next_action: "No specific numeric targets given yet (workout frequency, sleep target, nutrition/grooming routine) - needs those to become trackable rather than just a general intention."
     owner: benjaminshaibu01@gmail.com
 
+  - id: goal-french-building-structures-course
+    domain_id: french
+    name: "Building Structures in French (10-module course)"
+    description: "Owner-set cadence: finish one module every 3 days, starting 2026-09-08. Module deadlines in config/course_modules.yaml - the French page flags falling behind based on these."
+    why_it_matters: "Concrete, dated forcing-function underneath the broader A1-to-C2 goal."
+    strategic_importance: 7
+    status: in_progress
+    progress: 0
+    confidence: MEDIUM
+    owner: benjaminshaibu01@gmail.com
+
   - id: goal-spiritual-joshua-selman-practice
     domain_id: spiritual
     name: "Joshua Selman message practice + applied action items"

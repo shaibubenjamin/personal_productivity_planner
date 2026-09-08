@@ -120,6 +120,29 @@ def seed_learning_items(conn) -> int:
     return count
 
 
+def seed_tasks(conn) -> int:
+    tasks = load_yaml("course_modules.yaml").get("tasks") or []
+    for i, t in enumerate(tasks):
+        task_id = f"task-{t['goal_id']}-{i}"
+        conn.execute(
+            """
+            INSERT INTO tasks (id, goal_id, domain_id, title, deadline, status)
+            VALUES (:id, :goal_id, :domain_id, :title, :deadline, 'not_started')
+            ON CONFLICT(id) DO UPDATE SET
+                title=excluded.title, deadline=excluded.deadline
+            """,
+            {
+                "id": task_id,
+                "goal_id": t["goal_id"],
+                "domain_id": t["domain_id"],
+                "title": t["title"],
+                "deadline": t.get("deadline"),
+            },
+        )
+    conn.commit()
+    return len(tasks)
+
+
 def main() -> None:
     init_db()
     conn = get_connection()
@@ -127,7 +150,8 @@ def main() -> None:
         n_domains = seed_domains(conn)
         n_goals = seed_goals(conn)
         n_learning = seed_learning_items(conn)
-        print(f"Seeded {n_domains} domains, {n_goals} goals, {n_learning} learning items.")
+        n_tasks = seed_tasks(conn)
+        print(f"Seeded {n_domains} domains, {n_goals} goals, {n_learning} learning items, {n_tasks} tasks.")
     finally:
         conn.close()
 

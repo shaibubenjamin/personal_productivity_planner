@@ -18,13 +18,13 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from app.components.style import page_header  # noqa: E402
-from engine.common.db import get_connection, init_db  # noqa: E402
+from engine.common.db import DB_PATH, get_connection, init_db  # noqa: E402
 
 init_db()
 
 page_header("cleaning_services", "Digital Housekeeping")
 
-tab1, tab2, tab3 = st.tabs(["Claude Outputs", "Gmail", "Drive"])
+tab1, tab2, tab3, tab4 = st.tabs(["Claude Outputs", "Gmail", "Drive", "System"])
 
 with tab1:
     st.caption(
@@ -125,3 +125,64 @@ with tab3:
             "being set up in your Drive as the shared bridge between the "
             "cloud routines and this app - see the chat for details."
         )
+
+with tab4:
+    st.subheader("Storage")
+    db_size_mb = DB_PATH.stat().st_size / (1024 * 1024) if DB_PATH.exists() else 0
+    WARNING_THRESHOLD_MB = 200  # sanity-check threshold, not a real SQLite limit - see caption below
+    st.metric("Local database size", f"{db_size_mb:.2f} MB")
+    if db_size_mb > WARNING_THRESHOLD_MB:
+        st.warning(
+            f"Database has grown past {WARNING_THRESHOLD_MB} MB - unusual for this kind of "
+            "habit/goal-tracking data. Worth checking for unbounded log growth rather than "
+            "treating it as a real capacity limit (see caption below)."
+        )
+    else:
+        st.success(f"Well under the {WARNING_THRESHOLD_MB} MB sanity-check threshold.")
+    st.caption(
+        "SQLite itself has no meaningful ceiling for this use case (technical limit "
+        "is ~281 TB) - the real constraint is disk space on whatever machine runs it. "
+        "The threshold above is a bug-detection sanity check, not a genuine capacity "
+        "warning. One real risk: if this app is deployed to Streamlit Community Cloud "
+        "as-is, its containers are ephemeral - a local SQLite file can be wiped on "
+        "redeploy/restart. Migrating to hosted Postgres (already planned, see "
+        "docs/decision_log.md) removes that risk entirely."
+    )
+
+    st.divider()
+    st.subheader("Platform feedback")
+    st.caption(
+        "Log anything about the platform itself - not life/goal content - that "
+        "should improve (confusing layout, a missing action, something that felt "
+        "slow or unclear)."
+    )
+
+    conn = get_connection()
+    try:
+        feedback_items = conn.execute(
+            "SELECT * FROM platform_feedback ORDER BY created_at DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+
+    with st.form("add_feedback", clear_on_submit=True):
+        note = st.text_area("What should improve?")
+        if st.form_submit_button("Log feedback", type="primary") and note.strip():
+            conn = get_connection()
+            try:
+                conn.execute(
+                    "INSERT INTO platform_feedback (id, note) VALUES (:id, :note)",
+                    {"id": f"feedback-{uuid.uuid4().hex[:8]}", "note": note.strip()},
+                )
+                conn.commit()
+            finally:
+                conn.close()
+            st.rerun()
+
+    if feedback_items:
+        for f in feedback_items:
+            with st.container(border=True):
+                st.markdown(f["note"])
+                st.caption(f"{f['status']} · {f['created_at']}")
+    else:
+        st.info("No feedback logged yet.")

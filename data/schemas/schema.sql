@@ -57,6 +57,29 @@ CREATE TABLE goal_dependencies (
     PRIMARY KEY (goal_id, depends_on_goal_id)
 );
 
+-- One row per (habit_key, date). "Did I do X today" trackers - French AI
+-- tutor session, etc. Not tied to a goal/domain since these are pure daily
+-- habits, simpler than the goal/task model.
+CREATE TABLE daily_habits (
+    id TEXT PRIMARY KEY,
+    habit_key TEXT NOT NULL,
+    habit_label TEXT NOT NULL,
+    date DATE NOT NULL,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (habit_key, date)
+);
+
+-- Platform UX/usability feedback, separate from life-domain goal logs.
+CREATE TABLE platform_feedback (
+    id TEXT PRIMARY KEY,
+    note TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new','reviewed','actioned')),
+    response TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    reviewed_at TIMESTAMPTZ
+);
+
 CREATE TABLE goal_logs (
     id SERIAL PRIMARY KEY,
     goal_id TEXT NOT NULL REFERENCES goals(id),

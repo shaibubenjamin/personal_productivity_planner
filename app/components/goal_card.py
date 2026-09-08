@@ -5,7 +5,7 @@ drill-down view so the tick/note/status experience is identical everywhere
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import streamlit as st
 
@@ -124,11 +124,35 @@ def _load_tasks(goal_id: str):
         conn.close()
 
 
+def _schedule_status(tasks) -> str | None:
+    """Returns a warning string if dated to-dos are overdue, else None."""
+    today = date.today()
+    dated = [t for t in tasks if t["deadline"]]
+    if not dated:
+        return None
+    overdue = [t for t in dated if t["status"] != "done" and date.fromisoformat(t["deadline"]) < today]
+    if overdue:
+        names = ", ".join(t["title"] for t in overdue[:3])
+        more = f" (+{len(overdue) - 3} more)" if len(overdue) > 3 else ""
+        return f"Falling behind - {len(overdue)} overdue: {names}{more}"
+    return None
+
+
 def _render_todos(goal_id: str, tasks) -> None:
+    warning = _schedule_status(tasks)
+    if warning:
+        st.warning(warning, icon=":material/schedule:")
+
+    ordered = sorted(tasks, key=lambda t: (t["deadline"] or "9999-99-99", t["created_at"]))
     with st.expander(f"To-dos ({sum(1 for t in tasks if t['status'] == 'done')}/{len(tasks)})", expanded=len(tasks) > 0):
-        for t in tasks:
+        today = date.today()
+        for t in ordered:
             tc1, tc2 = st.columns([5, 3])
-            checked = tc1.checkbox(t["title"], value=(t["status"] == "done"), key=f"task_done_{t['id']}")
+            label = t["title"]
+            if t["deadline"]:
+                overdue = t["status"] != "done" and date.fromisoformat(t["deadline"]) < today
+                label += f"  ({'⚠ ' if overdue else ''}due {t['deadline']})"
+            checked = tc1.checkbox(label, value=(t["status"] == "done"), key=f"task_done_{t['id']}")
             new_note = tc2.text_input(
                 "note", value=t["notes"] or "", key=f"task_note_{t['id']}",
                 placeholder="note...", label_visibility="collapsed",
