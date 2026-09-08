@@ -1,14 +1,30 @@
 """Single-user login gate. Credentials come from environment variables
 (local .env, loaded via python-dotenv) or Streamlit secrets (deployed) -
 never hardcoded, never committed. The password itself is stored only as a
-salted SHA-256 hash; see docs/security.md for how it was generated.
+salted SHA-256 hash; see scripts/set_login_password.py to set one.
+
+Design note: an earlier version injected raw <div>/<svg>/<script> HTML via
+st.markdown(unsafe_allow_html=True) and it rendered as literal escaped text
+instead of real elements (owner-reported, 2026-09-08). Rather than keep
+guessing at that, this version uses two mechanisms that don't depend on
+markdown interpreting arbitrary HTML at all:
+  1. The background is pure CSS (a data-URI SVG on an existing Streamlit
+     container's `background-image`) via a <style> block - the same
+     st.markdown(unsafe_allow_html=True) mechanism, but CSS-only, which is
+     the part that was already proven to work (fonts/card styling elsewhere
+     in this app use the identical pattern).
+  2. The rotating quote uses st.components.v1.html, Streamlit's dedicated
+     API for embedding real interactive HTML/JS in a real iframe - not the
+     markdown pathway, so it isn't subject to whatever broke the div/script.
 """
 
 import hashlib
 import hmac
 import os
+import urllib.parse
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 try:
     from dotenv import load_dotenv
@@ -53,6 +69,9 @@ def _bird(x: float, y: float, scale: float, stroke: str) -> str:
 
 
 def _forest_svg() -> str:
+    """A complete, self-contained <svg>...</svg> string, flattened to one
+    line (no embedded newlines/indentation) so it's safe to URL-encode into
+    a CSS data URI."""
     trees_back = "".join(
         _pine(x, 640, scale, "#0d3b2c")
         for x, scale in [(80, 0.8), (230, 1.1), (400, 0.7), (560, 1.0), (740, 0.85),
@@ -64,61 +83,70 @@ def _forest_svg() -> str:
                           (880, 1.7), (1050, 1.15), (1230, 1.5), (1410, 1.3), (1560, 1.1)]
     )
     birds = "".join(_bird(x, y, s, "#04170f") for x, y, s in [(340, 160, 1.0), (420, 190, 0.8), (500, 155, 0.7)])
-    return f"""
-    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"
-         style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1;">
-      <defs>
-        <linearGradient id="peosSky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0a2e42"/>
-          <stop offset="45%" stop-color="#134e3a"/>
-          <stop offset="100%" stop-color="#0d3b2c"/>
-        </linearGradient>
-      </defs>
-      <rect width="1600" height="900" fill="url(#peosSky)"/>
-      <circle cx="1320" cy="170" r="65" fill="#FDE68A" opacity="0.9"/>
-      <circle cx="1320" cy="170" r="95" fill="#FDE68A" opacity="0.12"/>
-      {birds}
-      <path d="M0,620 Q400,540 800,600 T1600,580 L1600,900 L0,900 Z" fill="#12513c" opacity="0.75"/>
-      {trees_back}
-      {trees_front}
-    </svg>
-    """
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">'
+        "<defs><linearGradient id=\"sky\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">"
+        '<stop offset="0%" stop-color="#0a2e42"/>'
+        '<stop offset="45%" stop-color="#134e3a"/>'
+        '<stop offset="100%" stop-color="#0d3b2c"/>'
+        "</linearGradient></defs>"
+        '<rect width="1600" height="900" fill="url(#sky)"/>'
+        '<circle cx="1320" cy="170" r="65" fill="#FDE68A" opacity="0.9"/>'
+        '<circle cx="1320" cy="170" r="95" fill="#FDE68A" opacity="0.12"/>'
+        f"{birds}"
+        '<path d="M0,620 Q400,540 800,600 T1600,580 L1600,900 L0,900 Z" fill="#12513c" opacity="0.75"/>'
+        f"{trees_back}{trees_front}"
+        "</svg>"
+    )
 
 
-def _login_chrome() -> None:
-    """Forest/wildlife-themed animated background + rotating quote, login screen only."""
-    quotes_js = ",".join(f'"{q}"' for q in MOTIVATION_QUOTES)
+def _inject_background() -> None:
+    """CSS-only: background-image data URI + a glass-card look for the
+    login form, all via a <style> block - the mechanism already proven to
+    render correctly elsewhere in this app (app/components/style.py)."""
+    svg_data_uri = "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
     st.markdown(
+        "<style>"
+        f'[data-testid="stAppViewContainer"] {{ background-image: url("{svg_data_uri}"); '
+        "background-size: cover; background-position: center center; "
+        "background-attachment: fixed; background-repeat: no-repeat; }}"
+        '[data-testid="stHeader"] { background: transparent; }'
+        ".block-container { padding-top: 3rem; max-width: 480px; }"
+        ".block-container h1 { color: #ECFDF5; text-align: center; "
+        "text-shadow: 0 2px 10px rgba(0,0,0,0.6); font-weight: 700; }"
+        '.block-container [data-testid="stCaptionContainer"] { color: #D1FAE5; '
+        "text-align: center; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }"
+        '[data-testid="stForm"] { background: rgba(255,255,255,0.94); '
+        "padding: 1.75rem 1.75rem 1rem; border-radius: 1rem; "
+        "box-shadow: 0 12px 40px rgba(0,0,0,0.45); backdrop-filter: blur(4px); }"
+        "</style>",
+        unsafe_allow_html=True,
+    )
+
+
+def _render_rotating_quote() -> None:
+    """Real, executing JS via Streamlit's component API (not markdown)."""
+    quotes_json = "[" + ",".join(
+        '"' + q.replace("\\", "\\\\").replace('"', '\\"') + '"' for q in MOTIVATION_QUOTES
+    ) + "]"
+    components.html(
         f"""
-        <style>
-        @keyframes peosGlow {{
-            0% {{ filter: brightness(1); }}
-            50% {{ filter: brightness(1.08); }}
-            100% {{ filter: brightness(1); }}
-        }}
-        .peos-forest-bg {{ animation: peosGlow 12s ease-in-out infinite; }}
-        .peos-login-quote {{
-            color: #ECFDF5; font-size: 1.1rem; font-style: italic; text-align: center;
-            min-height: 4.5rem; padding: 1rem 1.5rem; margin-bottom: 1rem;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-        }}
-        [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{ background: transparent; }}
-        </style>
-        <div class="peos-forest-bg">{_forest_svg()}</div>
-        <div class="peos-login-quote" id="peos-quote"></div>
+        <div id="q" style="font-family: Inter, sans-serif; color: #ECFDF5;
+             font-size: 1.05rem; font-style: italic; text-align: center;
+             padding: 1.1rem 1.25rem; background: rgba(4, 23, 15, 0.55);
+             border-radius: 0.75rem; box-shadow: 0 6px 20px rgba(0,0,0,0.35);"></div>
         <script>
-        const peosQuotes = [{quotes_js}];
-        let peosQuoteIndex = 0;
-        function peosRotateQuote() {{
-            const el = document.getElementById("peos-quote");
-            if (el) {{ el.textContent = peosQuotes[peosQuoteIndex % peosQuotes.length]; }}
-            peosQuoteIndex++;
+        const quotes = {quotes_json};
+        let i = 0;
+        function rotate() {{
+            document.getElementById("q").textContent = quotes[i % quotes.length];
+            i++;
         }}
-        peosRotateQuote();
-        setInterval(peosRotateQuote, 10000);
+        rotate();
+        setInterval(rotate, 10000);
         </script>
         """,
-        unsafe_allow_html=True,
+        height=95,
     )
 
 
@@ -141,9 +169,10 @@ def require_login() -> bool:
     salt = _get_secret("PEOS_AUTH_PASSWORD_SALT")
     pw_hash = _get_secret("PEOS_AUTH_PASSWORD_HASH")
 
-    _login_chrome()
+    _inject_background()
     st.title("PEOS")
     st.caption("Personal Executive Operating System")
+    _render_rotating_quote()
 
     if not (username and salt and pw_hash):
         st.error(
