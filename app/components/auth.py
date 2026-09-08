@@ -170,8 +170,8 @@ def require_login() -> bool:
     pw_hash = _get_secret("PEOS_AUTH_PASSWORD_HASH")
 
     _inject_background()
-    st.title("PEOS")
-    st.caption("Personal Executive Operating System")
+    st.title("Productivity Tracker")
+    st.caption("Track your goals, habits, and progress across every domain of your life.")
     _render_rotating_quote()
 
     if not (username and salt and pw_hash):
