@@ -19,7 +19,7 @@ from app.components.style import page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 init_db()
-page_header("dashboard", "Executive Dashboard", "Personal Executive Operating System — V1, Phase 1/4")
+page_header("dashboard", "Executive Dashboard", "Productivity Tracker — V1, Phase 1/4")
 
 with st.container(border=True):
     render_daily_habit("french_ai_tutor", "Spoke to my French AI tutor today")

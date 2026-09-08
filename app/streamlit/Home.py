@@ -19,7 +19,7 @@ from app.components.auth import require_login  # noqa: E402
 from app.components.style import inject_css  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
-st.set_page_config(page_title="PEOS", page_icon=":material/dashboard:", layout="wide")
+st.set_page_config(page_title="Productivity Tracker", page_icon=":material/dashboard:", layout="wide")
 
 if require_login():
     inject_css()
