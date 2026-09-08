@@ -18,13 +18,18 @@ markdown interpreting arbitrary HTML at all:
      markdown pathway, so it isn't subject to whatever broke the div/script.
 """
 
+import base64
 import hashlib
 import hmac
 import os
 import urllib.parse
+from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+BACKGROUND_PHOTO_PATH = ASSETS_DIR / "login_background.jpg"
 
 try:
     from dotenv import load_dotenv
@@ -100,14 +105,24 @@ def _forest_svg() -> str:
     )
 
 
+def _background_data_uri() -> str:
+    """Real HD photo if the asset is present (read + base64 at runtime, not
+    baked into source); falls back to the hand-drawn SVG scene otherwise so
+    the login screen never breaks if the asset is ever missing."""
+    if BACKGROUND_PHOTO_PATH.exists():
+        encoded = base64.b64encode(BACKGROUND_PHOTO_PATH.read_bytes()).decode("ascii")
+        return f"data:image/jpeg;base64,{encoded}"
+    return "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
+
+
 def _inject_background() -> None:
     """CSS-only: background-image data URI + a glass-card look for the
     login form, all via a <style> block - the mechanism already proven to
     render correctly elsewhere in this app (app/components/style.py)."""
-    svg_data_uri = "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
+    data_uri = _background_data_uri()
     st.markdown(
         "<style>"
-        f'[data-testid="stAppViewContainer"] {{ background-image: url("{svg_data_uri}"); '
+        f'[data-testid="stAppViewContainer"] {{ background-image: url("{data_uri}"); '
         "background-size: cover; background-position: center center; "
         "background-attachment: fixed; background-repeat: no-repeat; }}"
         '[data-testid="stHeader"] { background: transparent; }'
