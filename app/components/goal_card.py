@@ -5,12 +5,20 @@ drill-down view so the tick/note/status experience is identical everywhere
 """
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import streamlit as st
 
 from app.components.style import domain_icon, icon_md
 from engine.common.db import get_connection
+from engine.goals.schedule_status import ScheduleStatus, assess_schedule
+
+SCHEDULE_BADGE = {
+    ScheduleStatus.ON_COURSE: ("On course", "#15803D", "#DCFCE7"),
+    ScheduleStatus.BEHIND: ("Falling behind", "#B91C1C", "#FEE2E2"),
+    ScheduleStatus.NO_DEADLINES: ("No deadlines set", "#B45309", "#FEF3C7"),
+    ScheduleStatus.NO_TASKS: ("No deliverables yet", "#64748B", "#F1F5F9"),
+}
 
 STATUS_OPTIONS = ["not_started", "in_progress", "at_risk", "done", "abandoned"]
 STATUS_LABEL = {
@@ -34,9 +42,19 @@ def render_goal_card(g, show_domain: bool = True) -> None:
 
         if g["why_it_matters"]:
             st.caption(g["why_it_matters"])
+        if g["deadline"]:
+            st.caption(f"Target date: {g['deadline']}")
 
         tasks = _load_tasks(g["id"])
         has_tasks = len(tasks) > 0
+
+        schedule_status, _overdue = assess_schedule(tasks)
+        label_text, text_color, bg_color = SCHEDULE_BADGE[schedule_status]
+        st.markdown(
+            f'<span style="color:{text_color}; background:{bg_color}; padding:0.15rem 0.6rem; '
+            f'border-radius:999px; font-size:0.78rem; font-weight:600;">{label_text}</span>',
+            unsafe_allow_html=True,
+        )
 
         col_status, col_progress = st.columns([1, 2])
         with col_status:
@@ -124,39 +142,34 @@ def _load_tasks(goal_id: str):
         conn.close()
 
 
-def _schedule_status(tasks) -> str | None:
-    """Returns a warning string if dated to-dos are overdue, else None."""
-    today = date.today()
-    dated = [t for t in tasks if t["deadline"]]
-    if not dated:
-        return None
-    overdue = [t for t in dated if t["status"] != "done" and date.fromisoformat(t["deadline"]) < today]
-    if overdue:
+def _render_todos(goal_id: str, tasks) -> None:
+    schedule_status, overdue = assess_schedule(tasks)
+    if schedule_status == ScheduleStatus.BEHIND:
         names = ", ".join(t["title"] for t in overdue[:3])
         more = f" (+{len(overdue) - 3} more)" if len(overdue) > 3 else ""
-        return f"Falling behind - {len(overdue)} overdue: {names}{more}"
-    return None
-
-
-def _render_todos(goal_id: str, tasks) -> None:
-    warning = _schedule_status(tasks)
-    if warning:
-        st.warning(warning, icon=":material/schedule:")
+        st.warning(f"Falling behind - {len(overdue)} overdue: {names}{more}", icon=":material/schedule:")
+    elif schedule_status == ScheduleStatus.NO_DEADLINES:
+        st.warning(
+            "None of these deliverables have a deadline yet - set one below so this "
+            "doesn't stay open-ended.",
+            icon=":material/event_busy:",
+        )
 
     ordered = sorted(tasks, key=lambda t: (t["deadline"] or "9999-99-99", t["created_at"]))
-    with st.expander(f"To-dos ({sum(1 for t in tasks if t['status'] == 'done')}/{len(tasks)})", expanded=len(tasks) > 0):
+    with st.expander(f"Deliverables ({sum(1 for t in tasks if t['status'] == 'done')}/{len(tasks)})", expanded=len(tasks) > 0):
         today = date.today()
         for t in ordered:
             tc1, tc2 = st.columns([5, 3])
             label = t["title"]
             if t["deadline"]:
-                overdue = t["status"] != "done" and date.fromisoformat(t["deadline"]) < today
-                label += f"  ({'⚠ ' if overdue else ''}due {t['deadline']})"
+                overdue_flag = t["status"] != "done" and date.fromisoformat(t["deadline"]) < today
+                label += f"  ({'⚠ ' if overdue_flag else ''}due {t['deadline']})"
             checked = tc1.checkbox(label, value=(t["status"] == "done"), key=f"task_done_{t['id']}")
             new_note = tc2.text_input(
                 "note", value=t["notes"] or "", key=f"task_note_{t['id']}",
                 placeholder="note...", label_visibility="collapsed",
             )
+
             new_status = "done" if checked else ("in_progress" if t["status"] == "in_progress" else "not_started")
             if new_status != t["status"] or new_note != (t["notes"] or ""):
                 conn = get_connection()
@@ -172,20 +185,45 @@ def _render_todos(goal_id: str, tasks) -> None:
                     conn.close()
                 st.rerun()
 
+            if not t["deadline"] and t["status"] != "done":
+                dc1, dc2 = st.columns([4, 1])
+                picked = dc1.date_input(
+                    "Set a deadline - currently open-ended",
+                    value=date.today() + timedelta(days=7),
+                    key=f"task_set_deadline_{t['id']}",
+                )
+                if dc2.button("Set", key=f"task_set_deadline_btn_{t['id']}"):
+                    conn = get_connection()
+                    try:
+                        conn.execute(
+                            "UPDATE tasks SET deadline = :deadline, updated_at = datetime('now') WHERE id = :id",
+                            {"deadline": picked.isoformat(), "id": t["id"]},
+                        )
+                        conn.commit()
+                    finally:
+                        conn.close()
+                    st.rerun()
+
         with st.form(f"add_task_form_{goal_id}", clear_on_submit=True):
-            new_title = st.text_input("Add a to-do", key=f"new_task_{goal_id}", placeholder="e.g. Finish chapter 3 of PMP prep")
-            if st.form_submit_button("Add to-do") and new_title.strip():
+            new_title = st.text_input("Add a deliverable", key=f"new_task_{goal_id}", placeholder="e.g. Finish chapter 3 of PMP prep")
+            new_deadline = st.date_input(
+                "Deadline (required - nothing stays open-ended)",
+                value=date.today() + timedelta(days=7),
+                key=f"new_task_deadline_{goal_id}",
+            )
+            if st.form_submit_button("Add deliverable") and new_title.strip():
                 conn = get_connection()
                 try:
                     domain_id = conn.execute(
                         "SELECT domain_id FROM goals WHERE id = :id", {"id": goal_id}
                     ).fetchone()["domain_id"]
                     conn.execute(
-                        "INSERT INTO tasks (id, goal_id, domain_id, title, status) "
-                        "VALUES (:id, :goal_id, :domain_id, :title, 'not_started')",
+                        "INSERT INTO tasks (id, goal_id, domain_id, title, deadline, status) "
+                        "VALUES (:id, :goal_id, :domain_id, :title, :deadline, 'not_started')",
                         {
                             "id": f"task-{uuid.uuid4().hex[:8]}", "goal_id": goal_id,
                             "domain_id": domain_id, "title": new_title.strip(),
+                            "deadline": new_deadline.isoformat(),
                         },
                     )
                     conn.commit()
