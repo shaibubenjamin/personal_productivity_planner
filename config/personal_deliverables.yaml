@@ -1,0 +1,29 @@
+# First dated deliverable for each new Personal-domain goal (owner request,
+# 2026-09-09: "nothing is left open-ended"). These are the FIRST step only -
+# each goal needs more deliverables added as it progresses; a single task
+# isn't a full plan for learning to swim/ride/climb, just an un-open-ended start.
+tasks:
+  - goal_id: goal-personal-learn-swim
+    domain_id: personal
+    title: "Book first swimming lesson / find a pool and instructor"
+    deadline: "2026-09-23"
+  - goal_id: goal-personal-learn-chess
+    domain_id: personal
+    title: "Learn the rules and play a first game"
+    deadline: "2026-09-16"
+  - goal_id: goal-personal-learn-snooker
+    domain_id: personal
+    title: "Find a snooker club/table and play a first session"
+    deadline: "2026-09-23"
+  - goal_id: goal-personal-learn-horse-riding
+    domain_id: personal
+    title: "Book a beginner horse-riding lesson"
+    deadline: "2026-09-30"
+  - goal_id: goal-personal-mountain-climbing
+    domain_id: personal
+    title: "Research a beginner-friendly climb/hike and set a target date"
+    deadline: "2026-09-30"
+  - goal_id: goal-personal-recharge-time
+    domain_id: personal
+    title: "Protect the first Recharge Time block (Sat Sept 12, 16:00-18:00 WAT)"
+    deadline: "2026-09-12"

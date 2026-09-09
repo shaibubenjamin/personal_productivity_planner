@@ -109,6 +109,88 @@ goals:
     confidence: MEDIUM
     owner: benjaminshaibu01@gmail.com
 
+  - id: goal-personal-learn-swim
+    domain_id: personal
+    name: "Learn to swim"
+    description: "Target date is a default (2026-12-09, 3 months out) - not owner-confirmed, adjust as needed."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-09."
+    strategic_importance: 5
+    target_date: "2026-12-09"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: book a swimming lesson / find a pool and instructor - see config/course_modules.yaml for the dated to-do."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-learn-chess
+    domain_id: personal
+    name: "Learn to play chess"
+    description: "Target date is a default (2026-11-09, 2 months out) - not owner-confirmed."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-09."
+    strategic_importance: 4
+    target_date: "2026-11-09"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: learn the rules and play a first game."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-learn-snooker
+    domain_id: personal
+    name: "Learn to play snooker"
+    description: "Target date is a default (2026-11-09, 2 months out) - not owner-confirmed."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-09."
+    strategic_importance: 4
+    target_date: "2026-11-09"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: find a snooker club/table and play a first session."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-learn-horse-riding
+    domain_id: personal
+    name: "Learn to ride a horse"
+    description: "Target date is a default (2027-01-09, 4 months out) - not owner-confirmed. Needs more logistics (finding a stable/instructor) than chess/snooker, hence the longer window."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-09."
+    strategic_importance: 4
+    target_date: "2027-01-09"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: book a beginner horse-riding lesson."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-mountain-climbing
+    domain_id: personal
+    name: "Go mountain climbing"
+    description: "Target date is a default (2027-03-09, 6 months out) - not owner-confirmed. Longest window since this likely needs fitness prep and trip planning, not just a single booking."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-09."
+    strategic_importance: 4
+    target_date: "2027-03-09"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: research a beginner-friendly climb/hike and set a concrete target date."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-recharge-time
+    domain_id: personal
+    name: "Protect breaks, recovery, and recharge time"
+    description: >
+      Ongoing practice, not a one-off deliverable - no single target_date by
+      design. A real recurring calendar event ("Recharge Time", Saturdays
+      16:00-18:00 Africa/Lagos) was created 2026-09-09 as the concrete
+      mechanism; the goal here is protecting that block, not just having it exist.
+    why_it_matters: "Owner-stated, 2026-09-09 - explicit counterweight to the intensity of the Career/French goals above."
+    strategic_importance: 6
+    status: in_progress
+    progress: 0
+    confidence: MEDIUM
+    review_frequency: weekly
+    next_action: "Protect the recurring Saturday Recharge Time block - don't let it get booked over."
+    owner: benjaminshaibu01@gmail.com
+
   - id: goal-spiritual-joshua-selman-practice
     domain_id: spiritual
     name: "Joshua Selman message practice + applied action items"

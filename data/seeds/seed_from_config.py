@@ -120,8 +120,13 @@ def seed_learning_items(conn) -> int:
     return count
 
 
+TASK_SOURCE_FILES = ["course_modules.yaml", "personal_deliverables.yaml"]
+
+
 def seed_tasks(conn) -> int:
-    tasks = load_yaml("course_modules.yaml").get("tasks") or []
+    tasks = []
+    for filename in TASK_SOURCE_FILES:
+        tasks.extend(load_yaml(filename).get("tasks") or [])
     for i, t in enumerate(tasks):
         task_id = f"task-{t['goal_id']}-{i}"
         conn.execute(
