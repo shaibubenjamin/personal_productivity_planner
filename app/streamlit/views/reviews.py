@@ -6,6 +6,7 @@ local data - computed for real, not a placeholder.
 """
 
 import sys
+import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -106,3 +107,61 @@ else:
             st.markdown(f"**{r['review_type'].title()} review — {r['review_date']}**")
             if r["summary"]:
                 st.write(r["summary"])
+
+st.divider()
+st.subheader("Decision Log")
+st.caption(
+    "Why a goal was prioritised, deferred, stopped, started, or changed - "
+    "your own strategic reasoning (spec Section 35), so future reviews can "
+    "see the reasoning, not just the outcome."
+)
+
+conn = get_connection()
+try:
+    all_goals = conn.execute("SELECT id, name FROM goals ORDER BY name").fetchall()
+    decisions = conn.execute("SELECT * FROM decision_log ORDER BY created_at DESC").fetchall()
+finally:
+    conn.close()
+
+DECISION_TYPES = ["prioritised", "deferred", "stopped", "started", "changed", "other"]
+goal_options = {g["name"]: g["id"] for g in all_goals}
+
+with st.expander("Log a decision", icon=":material/add:"):
+    with st.form("add_decision", clear_on_submit=True):
+        decision_type = st.selectbox("Type", DECISION_TYPES)
+        goal_name = st.selectbox("Related goal (optional)", ["(none)"] + list(goal_options.keys()))
+        description = st.text_input("What was decided")
+        rationale = st.text_area("Why")
+        if st.form_submit_button("Log decision", type="primary") and description.strip():
+            conn = get_connection()
+            try:
+                conn.execute(
+                    "INSERT INTO decision_log (id, decision_type, goal_id, description, rationale) "
+                    "VALUES (:id, :type, :goal_id, :desc, :rationale)",
+                    {
+                        "id": f"decision-{uuid.uuid4().hex[:8]}",
+                        "type": decision_type,
+                        "goal_id": goal_options.get(goal_name),
+                        "desc": description.strip(),
+                        "rationale": rationale.strip() or None,
+                    },
+                )
+                conn.commit()
+            finally:
+                conn.close()
+            st.rerun()
+
+if not decisions:
+    st.info("No decisions logged yet.")
+else:
+    goal_name_by_id = {g["id"]: g["name"] for g in all_goals}
+    for dec in decisions:
+        with st.container(border=True):
+            c1, c2 = st.columns([4, 1])
+            c1.markdown(f"**{dec['description']}**")
+            c2.markdown(f":gray[{dec['decision_type']}]")
+            if dec["goal_id"] and dec["goal_id"] in goal_name_by_id:
+                st.caption(f"Goal: {goal_name_by_id[dec['goal_id']]}")
+            if dec["rationale"]:
+                st.write(dec["rationale"])
+            st.caption(dec["created_at"])
