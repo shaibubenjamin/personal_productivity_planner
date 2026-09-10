@@ -29,7 +29,15 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
-BACKGROUND_PHOTO_PATH = ASSETS_DIR / "login_background.jpg"
+# The wide landscape is the actual full-bleed background (genuinely wide/HD,
+# so background-size:cover doesn't have to stretch/distort it). The owner's
+# own stag photo is portrait and low-res (640x958) - stretching ANY portrait
+# photo edge-to-edge across a wide screen looks soft/distorted regardless of
+# source quality, which is what prompted this redesign (owner feedback,
+# 2026-09-10). It's now shown via native st.image() at its real aspect
+# ratio in a framed panel instead, so it stays sharp.
+BACKGROUND_PHOTO_PATH = ASSETS_DIR / "login_background_landscape.jpg"
+FEATURE_PHOTO_PATH = ASSETS_DIR / "login_background.jpg"
 
 try:
     from dotenv import load_dotenv
@@ -126,7 +134,7 @@ def _inject_background() -> None:
         "background-size: cover; background-position: center center; "
         "background-attachment: fixed; background-repeat: no-repeat; }}"
         '[data-testid="stHeader"] { background: transparent; }'
-        ".block-container { padding-top: 3rem; max-width: 480px; }"
+        ".block-container { padding-top: 3rem; max-width: 780px; }"
         ".block-container h1 { color: #ECFDF5; text-align: center; "
         "text-shadow: 0 2px 10px rgba(0,0,0,0.6); font-weight: 700; }"
         '.block-container [data-testid="stCaptionContainer"] { color: #D1FAE5; '
@@ -134,6 +142,8 @@ def _inject_background() -> None:
         '[data-testid="stForm"] { background: rgba(255,255,255,0.94); '
         "padding: 1.75rem 1.75rem 1rem; border-radius: 1rem; "
         "box-shadow: 0 12px 40px rgba(0,0,0,0.45); backdrop-filter: blur(4px); }"
+        '[data-testid="stImage"] img { border-radius: 1rem; '
+        "box-shadow: 0 12px 40px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.25); }"
         "</style>",
         unsafe_allow_html=True,
     )
@@ -187,29 +197,38 @@ def require_login() -> bool:
     _inject_background()
     st.title("Productivity Tracker")
     st.caption("Track your goals, habits, and progress across every domain of your life.")
-    _render_rotating_quote()
 
-    if not (username and salt and pw_hash):
-        st.error(
-            "Login is not configured - set PEOS_AUTH_USERNAME, "
-            "PEOS_AUTH_PASSWORD_SALT, and PEOS_AUTH_PASSWORD_HASH in your "
-            "local .env, or in Streamlit secrets once deployed."
-        )
-        return False
+    if FEATURE_PHOTO_PATH.exists():
+        col_photo, col_form = st.columns([1, 1.2], vertical_alignment="center")
+        with col_photo:
+            st.image(str(FEATURE_PHOTO_PATH), use_container_width=True)
+    else:
+        col_form = st.container()
 
-    with st.form("login"):
-        input_user = st.text_input("Username")
-        input_pw = st.text_input("Password", type="password")
-        submitted = st.form_submit_button("Log in", type="primary")
+    with col_form:
+        _render_rotating_quote()
 
-    if submitted:
-        candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
-        user_ok = hmac.compare_digest(input_user.strip().lower(), username.strip().lower())
-        pw_ok = hmac.compare_digest(candidate_hash, pw_hash)
-        if user_ok and pw_ok:
-            st.session_state[SESSION_KEY] = True
-            st.rerun()
-        else:
-            st.error("Incorrect username or password.")
+        if not (username and salt and pw_hash):
+            st.error(
+                "Login is not configured - set PEOS_AUTH_USERNAME, "
+                "PEOS_AUTH_PASSWORD_SALT, and PEOS_AUTH_PASSWORD_HASH in your "
+                "local .env, or in Streamlit secrets once deployed."
+            )
+            return False
+
+        with st.form("login"):
+            input_user = st.text_input("Username")
+            input_pw = st.text_input("Password", type="password")
+            submitted = st.form_submit_button("Log in", type="primary")
+
+        if submitted:
+            candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
+            user_ok = hmac.compare_digest(input_user.strip().lower(), username.strip().lower())
+            pw_ok = hmac.compare_digest(candidate_hash, pw_hash)
+            if user_ok and pw_ok:
+                st.session_state[SESSION_KEY] = True
+                st.rerun()
+            else:
+                st.error("Incorrect username or password.")
 
     return False

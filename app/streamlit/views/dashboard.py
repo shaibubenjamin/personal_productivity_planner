@@ -5,6 +5,7 @@ Each domain card links straight into that domain's to-do/status view
 """
 
 import sys
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -15,7 +16,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from app.components.daily_habit import render_daily_habit  # noqa: E402
 from app.components.domain_card import render_domain_card  # noqa: E402
-from app.components.style import page_header  # noqa: E402
+from app.components.style import domain_icon, icon_md, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 init_db()
@@ -23,6 +24,40 @@ page_header("dashboard", "Executive Dashboard", "Productivity Tracker — V1, Ph
 
 with st.container(border=True):
     render_daily_habit("french_ai_tutor", "Spoke to my French AI tutor today")
+
+st.subheader("Today")
+st.caption("Every overdue or due-today deliverable, across every goal, in one place.")
+
+conn = get_connection()
+try:
+    due_items = conn.execute(
+        """
+        SELECT t.title, t.deadline, g.name AS goal_name, d.id AS domain_id, d.name AS domain_name
+        FROM tasks t
+        JOIN goals g ON t.goal_id = g.id
+        JOIN domains d ON t.domain_id = d.id
+        WHERE t.status != 'done' AND t.deadline IS NOT NULL AND t.deadline <= date('now')
+        ORDER BY t.deadline
+        """
+    ).fetchall()
+finally:
+    conn.close()
+
+if not due_items:
+    st.success("Nothing overdue or due today - clear.")
+else:
+    today_str = date.today().isoformat()
+    for item in due_items:
+        overdue = item["deadline"] < today_str
+        icon = domain_icon(item["domain_id"])
+        tag = "OVERDUE" if overdue else "DUE TODAY"
+        color = "#B91C1C" if overdue else "#B45309"
+        with st.container(border=True):
+            c1, c2 = st.columns([4, 1])
+            c1.markdown(f"{icon_md(icon)} **{item['title']}**  \n:gray[{item['goal_name']} · {item['domain_name']}]")
+            c2.markdown(f'<span style="color:{color}; font-weight:600;">{tag}</span>', unsafe_allow_html=True)
+
+st.divider()
 
 conn = get_connection()
 try:
