@@ -16,11 +16,15 @@ if str(REPO_ROOT) not in sys.path:
 
 from app.components.daily_habit import render_daily_habit  # noqa: E402
 from app.components.domain_card import render_domain_card  # noqa: E402
+from app.components.quick_capture import render_capture_inbox, render_quick_capture  # noqa: E402
 from app.components.style import domain_icon, icon_md, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 init_db()
 page_header("dashboard", "Executive Dashboard", "Productivity Tracker — V1, Phase 1/4")
+
+render_quick_capture()
+render_capture_inbox()
 
 with st.container(border=True):
     render_daily_habit("french_ai_tutor", "Spoke to my French AI tutor today")
