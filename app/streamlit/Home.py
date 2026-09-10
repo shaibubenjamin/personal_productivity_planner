@@ -30,8 +30,20 @@ if require_login():
         new_opportunities = conn.execute(
             "SELECT COUNT(*) AS n FROM intelligence_items WHERE category = 'opportunity' AND status = 'new'"
         ).fetchone()["n"]
+        overdue_deliverables = conn.execute(
+            "SELECT COUNT(*) AS n FROM tasks WHERE status != 'done' AND deadline IS NOT NULL AND deadline < date('now')"
+        ).fetchone()["n"]
     finally:
         conn.close()
+
+    if overdue_deliverables:
+        st.sidebar.markdown(
+            f'<div style="background:#FEE2E2; color:#B91C1C; padding:0.5rem 0.75rem; '
+            f'border-radius:0.5rem; font-weight:600; margin-bottom:0.5rem;">'
+            f":material/schedule: {overdue_deliverables} overdue deliverable"
+            f"{'s' if overdue_deliverables != 1 else ''}</div>",
+            unsafe_allow_html=True,
+        )
 
     if new_opportunities:
         st.sidebar.markdown(
