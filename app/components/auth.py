@@ -216,19 +216,32 @@ def require_login() -> bool:
             )
             return False
 
+        # Single-user app with one fixed account - asking for a username
+        # field alongside password was redundant, and the owner reported
+        # the field conflicting with the browser's own email/username
+        # autofill UI (2026-09-10). Password-only removes that entirely
+        # and is simpler, which is also just better UX for a one-user app.
+        st.caption(f"Signing in as {username}")
         with st.form("login"):
-            input_user = st.text_input("Username")
-            input_pw = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Log in", type="primary")
+            input_pw = st.text_input(
+                "Password", type="password", autocomplete="current-password",
+            )
+            submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
 
         if submitted:
             candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
-            user_ok = hmac.compare_digest(input_user.strip().lower(), username.strip().lower())
             pw_ok = hmac.compare_digest(candidate_hash, pw_hash)
-            if user_ok and pw_ok:
+            if pw_ok:
                 st.session_state[SESSION_KEY] = True
                 st.rerun()
             else:
-                st.error("Incorrect username or password.")
+                st.error("Incorrect password.")
 
     return False
+
+
+def render_logout_button() -> None:
+    """Sidebar logout - visible on every page once authenticated."""
+    if st.sidebar.button("Log out", icon=":material/logout:", use_container_width=True):
+        st.session_state[SESSION_KEY] = False
+        st.rerun()
