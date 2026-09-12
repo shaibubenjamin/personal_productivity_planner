@@ -9,9 +9,11 @@ goals:
     description: "Systematic capability build across PMP, climate finance, financial management for programme leaders, strategic leadership, resource mobilisation/blended finance, public policy, M&E/RBM, digital public infrastructure, executive communication - see config/learning_items.yaml for the ranked list and courses."
     why_it_matters: "Direct build toward the stated career direction: globally trusted technical programme leader across tech/data/geospatial/AI/climate/public policy/development finance/programme management/leadership."
     strategic_importance: 10
+    target_date: "2027-03-12"
     status: in_progress
     progress: 0
     confidence: MEDIUM
+    next_action: "Target date is a default (2027-03-12, 6 months out) - not owner-confirmed. It's an interim checkpoint (meaningful progress on the top 3 ranked capabilities), not 'all 9 capabilities complete' - see config/learning_items.yaml for the ranked list."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-financial-investing-forex
@@ -20,10 +22,11 @@ goals:
     description: ""
     why_it_matters: "Owner-stated financial development priority."
     strategic_importance: 6
+    target_date: "2026-10-12"
     status: not_started
     progress: 0
     confidence: LOW
-    next_action: "Define what 'learn' means concretely (course, paper-trading account, capital allocated) - currently just a direction, not yet a measurable goal."
+    next_action: "Target date is a default (2026-10-12, 1 month out) - not owner-confirmed. Deadline is to DEFINE what 'learn' means concretely (course, paper-trading account, capital allocated), not to master investing by then - currently just a direction, not yet a measurable goal."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-relationships-career-networking
@@ -32,10 +35,11 @@ goals:
     description: ""
     why_it_matters: "Owner-stated relationship priority, explicitly tied to career trajectory rather than treated as a separate social goal."
     strategic_importance: 7
+    target_date: "2026-10-12"
     status: not_started
     progress: 0
     confidence: LOW
-    next_action: "Define concretely: target people/organisations, cadence, or specific events/conferences to prioritise."
+    next_action: "Target date is a default (2026-10-12, 1 month out) - not owner-confirmed. Deadline is to DEFINE concrete targets (people/organisations, cadence, or specific events/conferences), not to have networked extensively by then."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-marriage-by-30
@@ -80,10 +84,11 @@ goals:
     description: "Goal is positioning for global opportunities and network, not the subject matter itself."
     why_it_matters: "Owner-stated academic priority, explicitly connected to career strategy per spec Domain 4."
     strategic_importance: 6
+    target_date: "2026-11-12"
     status: not_started
     progress: 0
     confidence: LOW
-    next_action: "No specific programs/universities named yet - needs a shortlist (target institutions/programs) before this becomes actionable."
+    next_action: "Target date is a default (2026-11-12, 2 months out) - not owner-confirmed. Deadline is to produce a SHORTLIST of target institutions/programs (research takes longer than the 1-month deadlines above), not to be enrolled by then."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-personal-health-habits
@@ -92,10 +97,11 @@ goals:
     description: "Owner-stated scope for the Personal domain: physical health and men's habits."
     why_it_matters: "Baseline physical/habit foundation underneath everything else - without it, the Career/French intensity above isn't sustainable."
     strategic_importance: 5
+    target_date: "2026-10-12"
     status: not_started
     progress: 0
     confidence: LOW
-    next_action: "No specific numeric targets given yet (workout frequency, sleep target, nutrition/grooming routine) - needs those to become trackable rather than just a general intention."
+    next_action: "Target date is a default (2026-10-12, 1 month out) - not owner-confirmed. Deadline is to DEFINE specific numeric targets (workout frequency, sleep target, nutrition/grooming routine), not to have achieved them."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-french-building-structures-course
@@ -104,9 +110,11 @@ goals:
     description: "Owner-set cadence: finish one module every 3 days, starting 2026-09-08. Module deadlines in config/course_modules.yaml - the French page flags falling behind based on these."
     why_it_matters: "Concrete, dated forcing-function underneath the broader A1-to-C2 goal."
     strategic_importance: 7
+    target_date: "2026-10-08"
     status: in_progress
     progress: 0
     confidence: MEDIUM
+    next_action: "Target date matches Module 10's deadline in config/course_modules.yaml - the course's own completion date, not a separate estimate."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-personal-learn-swim
@@ -199,8 +207,9 @@ goals:
       items from them to apply, rather than passive listening.
     why_it_matters: "Owner-stated spiritual practice, explicitly framed around application, not just consumption."
     strategic_importance: 5
+    target_date: "2026-10-12"
     status: not_started
     progress: 0
     confidence: LOW
-    next_action: "Structure proposed in chat 2026-09-07 (message/date/rating/action-item log, mirroring the books table). Needs the owner's first few message titles to seed real entries instead of an empty structure."
+    next_action: "Target date is a default (2026-10-12, 1 month out) - not owner-confirmed. Structure proposed in chat 2026-09-07 (message/date/rating/action-item log, mirroring the books table); deadline is to log the first 4 message entries, not to complete the practice."
     owner: benjaminshaibu01@gmail.com

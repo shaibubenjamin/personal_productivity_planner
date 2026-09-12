@@ -22,7 +22,8 @@ def render_daily_habit(habit_key: str, label: str) -> None:
         completed_dates = {
             date.fromisoformat(r["date"])
             for r in conn.execute(
-                "SELECT date FROM daily_habits WHERE habit_key = :k AND completed = 1", {"k": habit_key}
+                "SELECT date FROM daily_habits WHERE habit_key = :k AND completed = :completed",
+                {"k": habit_key, "completed": True},
             ).fetchall()
         }
     finally:
@@ -52,7 +53,7 @@ def render_daily_habit(habit_key: str, label: str) -> None:
                     "key": habit_key,
                     "label": label,
                     "date": today,
-                    "completed": 1 if checked else 0,
+                    "completed": checked,
                 },
             )
             conn.commit()

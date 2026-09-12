@@ -63,7 +63,7 @@ with tab1:
                 try:
                     conn.execute(
                         "UPDATE claude_outputs SET reviewed = :reviewed, action_taken = :action WHERE id = :id",
-                        {"reviewed": 1 if reviewed else 0, "action": action, "id": o["id"]},
+                        {"reviewed": reviewed, "action": action, "id": o["id"]},
                     )
                     conn.commit()
                 finally:
@@ -99,7 +99,7 @@ with tab1:
 with tab2:
     conn = get_connection()
     try:
-        emails = conn.execute("SELECT COUNT(*) AS n FROM emails WHERE processed = 0").fetchone()["n"]
+        emails = conn.execute("SELECT COUNT(*) AS n FROM emails WHERE processed = FALSE").fetchone()["n"]
     finally:
         conn.close()
     st.metric("Unprocessed emails in review queue", emails)

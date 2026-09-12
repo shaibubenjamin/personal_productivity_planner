@@ -7,6 +7,7 @@ into the single views/domain_detail.py from its card on the dashboard.
 """
 
 import sys
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -31,7 +32,8 @@ if require_login():
             "SELECT COUNT(*) AS n FROM intelligence_items WHERE category = 'opportunity' AND status = 'new'"
         ).fetchone()["n"]
         overdue_deliverables = conn.execute(
-            "SELECT COUNT(*) AS n FROM tasks WHERE status != 'done' AND deadline IS NOT NULL AND deadline < date('now')"
+            "SELECT COUNT(*) AS n FROM tasks WHERE status != 'done' AND deadline IS NOT NULL AND deadline < :today",
+            {"today": date.today().isoformat()},
         ).fetchone()["n"]
     finally:
         conn.close()

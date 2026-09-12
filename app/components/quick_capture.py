@@ -5,7 +5,7 @@ below, per the confidence model (never present an inference as fact).
 """
 
 import uuid
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 import streamlit as st
 
@@ -47,7 +47,7 @@ def render_capture_inbox() -> None:
         pending = conn.execute(
             "SELECT * FROM captures WHERE status = 'new' ORDER BY created_at DESC"
         ).fetchall()
-        domains = conn.execute("SELECT id, name FROM domains WHERE active = 1 ORDER BY name").fetchall()
+        domains = conn.execute("SELECT id, name FROM domains WHERE active = TRUE ORDER BY name").fetchall()
         goals = conn.execute("SELECT id, domain_id, name FROM goals").fetchall()
     finally:
         conn.close()
@@ -109,8 +109,11 @@ def render_capture_inbox() -> None:
                         )
                         conn.execute(
                             "UPDATE captures SET status = 'triaged', domain_id = :d, goal_id = :g, "
-                            "resulting_task_id = :t, triaged_at = datetime('now') WHERE id = :id",
-                            {"d": chosen_domain_id, "g": chosen_goal_id, "t": task_id, "id": c["id"]},
+                            "resulting_task_id = :t, triaged_at = :now WHERE id = :id",
+                            {
+                                "d": chosen_domain_id, "g": chosen_goal_id, "t": task_id,
+                                "now": datetime.now(timezone.utc).isoformat(), "id": c["id"],
+                            },
                         )
                         conn.commit()
                     finally:
@@ -126,8 +129,11 @@ def render_capture_inbox() -> None:
                         )
                         conn.execute(
                             "UPDATE captures SET status = 'triaged', domain_id = :d, goal_id = :g, "
-                            "triaged_at = datetime('now') WHERE id = :id",
-                            {"d": chosen_domain_id, "g": chosen_goal_id, "id": c["id"]},
+                            "triaged_at = :now WHERE id = :id",
+                            {
+                                "d": chosen_domain_id, "g": chosen_goal_id,
+                                "now": datetime.now(timezone.utc).isoformat(), "id": c["id"],
+                            },
                         )
                         conn.commit()
                     finally:
@@ -138,8 +144,8 @@ def render_capture_inbox() -> None:
                     conn = get_connection()
                     try:
                         conn.execute(
-                            "UPDATE captures SET status = 'discarded', triaged_at = datetime('now') WHERE id = :id",
-                            {"id": c["id"]},
+                            "UPDATE captures SET status = 'discarded', triaged_at = :now WHERE id = :id",
+                            {"now": datetime.now(timezone.utc).isoformat(), "id": c["id"]},
                         )
                         conn.commit()
                     finally:

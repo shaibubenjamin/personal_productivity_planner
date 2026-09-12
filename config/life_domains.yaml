@@ -1,59 +1,62 @@
 # Life domains and their strategic weights / minimum-attention thresholds.
-# Weights below are a first real pass from the 2026-09-07 domain interview.
-# Career's dominance reflects the owner's own emphasis (9 ranked capability
-# priorities, all Critical/Very High) - everything else is a reasonable-default
-# split of the remainder, NOT independently confirmed. Flagged per-domain
-# where the owner's answer was qualitative only (no % given).
+# Owner-confirmed 2026-09-12: Career is 50%, and every other domain shares
+# the remaining 50% equally. 7 other domains -> 50/7 = 7.142857...% each,
+# stored to 4 decimal places (7 x 7.1429 = 50.0003, off by ~0.0003pp from
+# rounding only - not a data error). Both strategic_weight and
+# minimum_attention_pct carry the same number, matching the existing pattern.
 domains:
   - id: personal
     name: Personal
-    strategic_weight: 5
-    minimum_attention_pct: 5
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
-    note: "Scope confirmed 2026-09-07: men's health and habits. Weight % still a default, not owner-confirmed."
+    note: "Scope confirmed 2026-09-07: men's health and habits. Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: career
     name: Career
     strategic_weight: 50
     minimum_attention_pct: 50
     active: true
-    note: "Owner gave 9 ranked capability priorities (all Critical/Very High) - weight reflects that emphasis but the exact % is my default, not the owner's number."
+    note: "Owner-confirmed 2026-09-12: Career is 50% of total attention, every other domain splits the remaining 50% equally."
 
   - id: financial
     name: Financial
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
+    note: "Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: academics
     name: Academics
-    strategic_weight: 5
-    minimum_attention_pct: 5
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
+    note: "Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: relationships
     name: Relationships
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
+    note: "Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: spiritual
     name: Spiritual
-    strategic_weight: 5
-    minimum_attention_pct: 5
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
-    note: "Practice confirmed 2026-09-07: rank/track Joshua Selman messages, derive applied action items from each. Weight % still a default, not owner-confirmed."
+    note: "Practice confirmed 2026-09-07: rank/track Joshua Selman messages, derive applied action items from each. Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: marriage
     name: Marriage
-    strategic_weight: 5
-    minimum_attention_pct: 5
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
-    note: "Treated as distinct from the broader Relationships domain per spec Domain 7. Goal: married by age 30 (~2027-09-17, assuming birthday 2026-09-17 turning 29)."
+    note: "Treated as distinct from the broader Relationships domain per spec Domain 7. Goal: married by age 30 (~2027-09-17, assuming birthday 2026-09-17 turning 29). Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: french
     name: French
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 7.1429
+    minimum_attention_pct: 7.1429
     active: true
-    note: "Goal: C2 by age 30 (~2027-09-17). Current level not yet given."
+    note: "Goal: C2 by age 30 (~2027-09-17). Current level not yet given. Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."

@@ -120,7 +120,7 @@ def seed_learning_items(conn) -> int:
     return count
 
 
-TASK_SOURCE_FILES = ["course_modules.yaml", "personal_deliverables.yaml"]
+TASK_SOURCE_FILES = ["course_modules.yaml", "personal_deliverables.yaml", "life_domain_deliverables.yaml"]
 
 
 def seed_tasks(conn) -> int:

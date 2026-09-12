@@ -1,0 +1,46 @@
+# First dated deliverable for the six goals that had no target_date or
+# deliverables at all (owner request, 2026-09-12: "set deadline for the
+# goals under each area of my life"). Each deadline is for making the goal
+# CONCRETE (a plan, a shortlist, a defined target) rather than for
+# completing the underlying multi-month/year ambition - see the matching
+# next_action note on each goal in config/goals.yaml for why.
+tasks:
+  - goal_id: goal-career-capability-plan
+    domain_id: career
+    title: "Enrol in and start the PMP prep course (capability #1 of 9)"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-financial-investing-forex
+    domain_id: financial
+    title: "Define a concrete investing/forex learning plan (course + paper-trading account)"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-relationships-career-networking
+    domain_id: relationships
+    title: "List 5 target people/organisations/events to prioritise for networking"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-academics-university-affiliation
+    domain_id: academics
+    title: "Shortlist 3-5 target university programs"
+    deadline: "2026-11-12"
+
+  - goal_id: goal-personal-health-habits
+    domain_id: personal
+    title: "Define concrete workout/sleep/nutrition targets"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-spiritual-joshua-selman-practice
+    domain_id: spiritual
+    title: "Log the first 4 Joshua Selman messages with rating + action item"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-marriage-by-30
+    domain_id: marriage
+    title: "Initial reflection on marriage-readiness (financial/emotional/personal prep)"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-french-c2-by-30
+    domain_id: french
+    title: "Reach A2 French level (first milestone toward C2)"
+    deadline: "2026-11-15"

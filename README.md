@@ -8,7 +8,7 @@ This repository is private. It will eventually hold configuration and (synthetic
 
 ## Status
 
-Pre-implementation. See `docs/architecture.md` for the full blueprint and `docs/decision_log.md` for the decisions made so far. Currently in **Phase 0/1 (Discovery/Foundation)** — no live Gmail/Calendar/Drive integration exists yet, no automation runs yet.
+Live and in daily use (updated 2026-09-12). See `docs/architecture.md` for the full blueprint and `docs/decision_log.md` for the decisions made so far and a running history of what's shipped. The daily 4 AM executive brief and weekly review email run unattended via claude.ai's Google Workspace connectors (see `docs/automation.md`). Every domain has real goals with deadlines, an "on course / falling behind" status, a quick-capture inbox, a decision log, and habit streaks. Currently migrating storage from local SQLite to hosted Postgres (Supabase) - see `docs/decision_log.md` for progress.
 
 ## Layers
 

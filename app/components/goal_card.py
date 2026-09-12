@@ -42,8 +42,30 @@ def render_goal_card(g, show_domain: bool = True) -> None:
 
         if g["why_it_matters"]:
             st.caption(g["why_it_matters"])
-        if g["deadline"]:
-            st.caption(f"Target date: {g['deadline']}")
+
+        tc1, tc2 = st.columns([3, 1])
+        tc1.caption(f"Target date: {g['deadline']}" if g["deadline"] else "Target date: not set")
+        with tc2.popover("Adjust", icon=":material/edit_calendar:", use_container_width=True):
+            new_target_date = st.date_input(
+                "Target date",
+                value=date.fromisoformat(g["deadline"]) if g["deadline"] else date.today() + timedelta(days=30),
+                key=f"target_date_{g['id']}",
+            )
+            if st.button("Save", key=f"save_target_date_{g['id']}"):
+                conn = get_connection()
+                try:
+                    conn.execute(
+                        "UPDATE goals SET deadline = :deadline, updated_at = :now WHERE id = :id",
+                        {
+                            "deadline": new_target_date.isoformat(),
+                            "now": datetime.now(timezone.utc).isoformat(),
+                            "id": g["id"],
+                        },
+                    )
+                    conn.commit()
+                finally:
+                    conn.close()
+                st.rerun()
 
         tasks = _load_tasks(g["id"])
         has_tasks = len(tasks) > 0
@@ -172,13 +194,14 @@ def _render_todos(goal_id: str, tasks) -> None:
 
             new_status = "done" if checked else ("in_progress" if t["status"] == "in_progress" else "not_started")
             if new_status != t["status"] or new_note != (t["notes"] or ""):
+                now = datetime.now(timezone.utc).isoformat()
                 conn = get_connection()
                 try:
                     conn.execute(
                         "UPDATE tasks SET status = :status, notes = :notes, "
-                        "completed_at = CASE WHEN :status = 'done' THEN datetime('now') ELSE NULL END, "
-                        "updated_at = datetime('now') WHERE id = :id",
-                        {"status": new_status, "notes": new_note, "id": t["id"]},
+                        "completed_at = CASE WHEN :status = 'done' THEN :now ELSE NULL END, "
+                        "updated_at = :now WHERE id = :id",
+                        {"status": new_status, "notes": new_note, "now": now, "id": t["id"]},
                     )
                     conn.commit()
                 finally:
@@ -196,8 +219,12 @@ def _render_todos(goal_id: str, tasks) -> None:
                     conn = get_connection()
                     try:
                         conn.execute(
-                            "UPDATE tasks SET deadline = :deadline, updated_at = datetime('now') WHERE id = :id",
-                            {"deadline": picked.isoformat(), "id": t["id"]},
+                            "UPDATE tasks SET deadline = :deadline, updated_at = :now WHERE id = :id",
+                            {
+                                "deadline": picked.isoformat(),
+                                "now": datetime.now(timezone.utc).isoformat(),
+                                "id": t["id"],
+                            },
                         )
                         conn.commit()
                     finally:
