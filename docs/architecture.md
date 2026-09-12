@@ -2,7 +2,7 @@
 
 This is the canonical, in-repo copy of the implementation blueprint. The original draft (created before this repo existed) lives at `../../PEOS_ARCHITECTURE_BLUEPRINT.md` outside the repo — treat *this* file as source of truth going forward; update it, not the outside copy.
 
-Status: Phase 0/1 (Discovery/Foundation). No live Gmail/Calendar/Drive integration yet. No automation runs yet.
+Status (updated 2026-09-12): Live and in daily use. Gmail/Calendar/Drive integration is real via claude.ai's Workspace connectors - the daily 4 AM brief and weekly review email routines have been running unattended since 2026-09-07/08 (see `decision_log.md` for verified run history). Postgres/Supabase migration is in progress (see `decision_log.md`, 2026-09-12) - SQLite remains the fallback backend until it's fully cut over.
 
 ## 0. Tooling reality
 

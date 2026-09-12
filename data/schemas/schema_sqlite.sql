@@ -86,37 +86,6 @@ CREATE TABLE goal_logs (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Quick capture inbox: "write it down now, triage later" (GTD-style). A
--- capture starts with a best-guess domain/goal (keyword heuristic, see
--- engine/capture/triage.py) but is not committed anywhere real until the
--- owner confirms it - the suggestion is never silently treated as fact.
-CREATE TABLE captures (
-    id TEXT PRIMARY KEY,
-    raw_text TEXT NOT NULL,
-    suggested_domain_id TEXT REFERENCES domains(id),
-    suggested_goal_id TEXT REFERENCES goals(id),
-    domain_id TEXT REFERENCES domains(id),
-    goal_id TEXT REFERENCES goals(id),
-    status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'triaged', 'discarded')),
-    resulting_task_id TEXT REFERENCES tasks(id),
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    triaged_at TEXT
-);
-
--- Spec Section 35: why a goal was prioritised/deferred/stopped - the
--- owner's own strategic reasoning, not this repo's engineering decisions
--- (those stay in docs/decision_log.md).
-CREATE TABLE decision_log (
-    id TEXT PRIMARY KEY,
-    decision_type TEXT NOT NULL CHECK (
-        decision_type IN ('prioritised', 'deferred', 'stopped', 'started', 'changed', 'other')
-    ),
-    goal_id TEXT REFERENCES goals(id),
-    description TEXT NOT NULL,
-    rationale TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
 CREATE TABLE goal_risks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     goal_id TEXT NOT NULL REFERENCES goals(id),
@@ -151,6 +120,41 @@ CREATE TABLE tasks (
     completed_at TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Quick capture inbox: "write it down now, triage later" (GTD-style). A
+-- capture starts with a best-guess domain/goal (keyword heuristic, see
+-- engine/capture/triage.py) but is not committed anywhere real until the
+-- owner confirms it - the suggestion is never silently treated as fact.
+-- Defined after tasks/projects: Postgres validates FK target tables at
+-- CREATE TABLE time (unlike SQLite, which only checks at DML time), so
+-- resulting_task_id -> tasks(id) requires tasks to already exist here -
+-- kept in the same order as schema.sql even though SQLite doesn't require it.
+CREATE TABLE captures (
+    id TEXT PRIMARY KEY,
+    raw_text TEXT NOT NULL,
+    suggested_domain_id TEXT REFERENCES domains(id),
+    suggested_goal_id TEXT REFERENCES goals(id),
+    domain_id TEXT REFERENCES domains(id),
+    goal_id TEXT REFERENCES goals(id),
+    status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'triaged', 'discarded')),
+    resulting_task_id TEXT REFERENCES tasks(id),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    triaged_at TEXT
+);
+
+-- Spec Section 35: why a goal was prioritised/deferred/stopped - the
+-- owner's own strategic reasoning, not this repo's engineering decisions
+-- (those stay in docs/decision_log.md).
+CREATE TABLE decision_log (
+    id TEXT PRIMARY KEY,
+    decision_type TEXT NOT NULL CHECK (
+        decision_type IN ('prioritised', 'deferred', 'stopped', 'started', 'changed', 'other')
+    ),
+    goal_id TEXT REFERENCES goals(id),
+    description TEXT NOT NULL,
+    rationale TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE commitments (

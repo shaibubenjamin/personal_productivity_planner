@@ -40,9 +40,10 @@ try:
         FROM tasks t
         JOIN goals g ON t.goal_id = g.id
         JOIN domains d ON t.domain_id = d.id
-        WHERE t.status != 'done' AND t.deadline IS NOT NULL AND t.deadline <= date('now')
+        WHERE t.status != 'done' AND t.deadline IS NOT NULL AND t.deadline <= :today
         ORDER BY t.deadline
-        """
+        """,
+        {"today": date.today().isoformat()},
     ).fetchall()
 finally:
     conn.close()
@@ -66,7 +67,7 @@ st.divider()
 conn = get_connection()
 try:
     domains = conn.execute(
-        "SELECT * FROM domains WHERE active = 1 ORDER BY strategic_weight DESC NULLS LAST, name"
+        "SELECT * FROM domains WHERE active = TRUE ORDER BY strategic_weight DESC NULLS LAST, name"
     ).fetchall()
     goal_count = conn.execute("SELECT COUNT(*) AS n FROM goals").fetchone()["n"]
 finally:

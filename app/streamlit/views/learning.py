@@ -53,13 +53,14 @@ def _render_item(item) -> None:
 
         new_status = "done" if done else ("in_progress" if item["status"] != "not_started" else "not_started")
         if new_status != item["status"]:
+            now = datetime.now(timezone.utc).isoformat()
             conn = get_connection()
             try:
                 conn.execute(
                     "UPDATE learning_items SET status = :status, "
-                    "completed_at = CASE WHEN :status = 'done' THEN datetime('now') ELSE NULL END, "
-                    "updated_at = datetime('now') WHERE id = :id",
-                    {"status": new_status, "id": item["id"]},
+                    "completed_at = CASE WHEN :status = 'done' THEN :now ELSE NULL END, "
+                    "updated_at = :now WHERE id = :id",
+                    {"status": new_status, "now": now, "id": item["id"]},
                 )
                 conn.commit()
             finally:
@@ -134,7 +135,7 @@ st.divider()
 with st.expander("Add a learning item", icon=":material/add:"):
     conn = get_connection()
     try:
-        domains = conn.execute("SELECT id, name FROM domains WHERE active = 1 ORDER BY name").fetchall()
+        domains = conn.execute("SELECT id, name FROM domains WHERE active = TRUE ORDER BY name").fetchall()
     finally:
         conn.close()
     domain_options = {d["name"]: d["id"] for d in domains}

@@ -31,11 +31,14 @@ STEPS
    PEOS_AUTH_USERNAME = "benjaminshaibu01@gmail.com"
    PEOS_AUTH_PASSWORD_SALT = "<copy from your local .env>"
    PEOS_AUTH_PASSWORD_HASH = "<copy from your local .env>"
+   DATABASE_URL = "<copy from your local .env, once the Postgres/Supabase migration is done>"
 
-   Get those two values from the PEOS_AUTH_PASSWORD_SALT and
-   PEOS_AUTH_PASSWORD_HASH lines in your local .env file (repo root,
+   Get the first three values from your local .env file (repo root,
    gitignored, not something Claude can read out to you here since it's
-   a secret - open it yourself in a text editor).
+   a secret - open it yourself in a text editor). DATABASE_URL is optional
+   until the Postgres migration (see docs/decision_log.md) is complete -
+   without it, the deployed app falls back to its own local SQLite file,
+   with the ephemeral-storage caveat below.
 
 5. Click "Deploy". First build takes a minute or two.
 
@@ -46,9 +49,9 @@ STEPS
 
 IMPORTANT - READ BEFORE RELYING ON THE DEPLOYED APP
 ----------------------------------------------------
-Streamlit Community Cloud's storage is EPHEMERAL. This app currently
-stores everything in a local SQLite file (data/local/peos.db), which is
-gitignored and does NOT get deployed with the code. That means:
+IF you did NOT set DATABASE_URL above: Streamlit Community Cloud's storage
+is EPHEMERAL. This app falls back to a local SQLite file (data/local/peos.db),
+which is gitignored and does NOT get deployed with the code. That means:
 
   - The deployed app starts with an EMPTY database (freshly re-seeded from
     config/*.yaml on first run - domains, goals, learning items, French
@@ -59,10 +62,12 @@ gitignored and does NOT get deployed with the code. That means:
   - Your LOCAL app (data/local/peos.db on this machine) is unaffected -
     the two are separate databases once deployed.
 
-Bottom line: treat the deployed version as a preview/mobile-access
-convenience for now, not the source of truth, until the Postgres/Supabase
-migration (already planned - see docs/decision_log.md) replaces local
-SQLite with a database both the local and deployed app actually share.
+IF you DID set DATABASE_URL (Postgres/Supabase): none of the above
+applies - the deployed app and your local app share the same real
+database, and nothing is wiped on redeploy/restart/sleep. Run
+`python -m scripts.migrate_to_postgres` locally first (once, after
+rotating the Supabase database password and putting it in your local
+.env) to copy your existing local data over before deploying.
 
 OPTIONAL - custom subdomain
 ----------------------------

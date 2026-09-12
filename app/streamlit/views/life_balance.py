@@ -25,7 +25,7 @@ page_header(
 conn = get_connection()
 try:
     domains = conn.execute(
-        "SELECT * FROM domains WHERE active = 1 ORDER BY name"
+        "SELECT * FROM domains WHERE active = TRUE ORDER BY name"
     ).fetchall()
 finally:
     conn.close()
