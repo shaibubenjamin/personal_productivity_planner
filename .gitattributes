@@ -1,7 +1,0 @@
-# Force LF for files that run inside Linux containers, regardless of the
-# checkout platform's line-ending settings (this bit us during Docker setup -
-# Windows git can silently convert these to CRLF, which breaks `sh` inside
-# the container with a "bad interpreter" error).
-*.sh text eol=lf
-Dockerfile text eol=lf
-docker-compose.yml text eol=lf

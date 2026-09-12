@@ -20,20 +20,12 @@ Live and in daily use (updated 2026-09-12). See `docs/architecture.md` for the f
 
 ## Setup
 
-### Docker (recommended — works the same on any machine)
-
-```
-docker compose up --build
-```
-
-Then open http://localhost:8501. SQLite data persists in `data/local/` on the host (mounted as a volume), so `docker compose down` / `up` again doesn't lose it. Copy `.env.example` to `.env` first if you need any of those variables set — it's optional for local SQLite-only runs.
-
-### Without Docker
-
 1. Copy `.env.example` to `.env` and fill in real values locally. Never commit `.env`.
 2. See `docs/security.md` for credential handling rules before running anything against real accounts.
 3. `python -m venv .venv && .venv\Scripts\pip install -r requirements.txt` (Windows) or the POSIX equivalent.
 4. `.venv\Scripts\python -m streamlit run app/streamlit/Home.py`
+
+Storage is hosted Postgres (Supabase) via `DATABASE_URL` in `.env` - see `docs/decision_log.md` for the migration. No local database setup is required beyond that.
 
 ## Automation
 
