@@ -6,6 +6,7 @@ hoc routine runs) and whether you've reviewed it / what you did about it
 queues below, which are about YOUR inbox/Drive, not PEOS's own output.
 """
 
+import os
 import sys
 import uuid
 from datetime import datetime, timezone
@@ -128,26 +129,31 @@ with tab3:
 
 with tab4:
     st.subheader("Storage")
-    db_size_mb = DB_PATH.stat().st_size / (1024 * 1024) if DB_PATH.exists() else 0
-    WARNING_THRESHOLD_MB = 200  # sanity-check threshold, not a real SQLite limit - see caption below
-    st.metric("Local database size", f"{db_size_mb:.2f} MB")
-    if db_size_mb > WARNING_THRESHOLD_MB:
-        st.warning(
-            f"Database has grown past {WARNING_THRESHOLD_MB} MB - unusual for this kind of "
-            "habit/goal-tracking data. Worth checking for unbounded log growth rather than "
-            "treating it as a real capacity limit (see caption below)."
+    if os.environ.get("DATABASE_URL"):
+        st.success("Connected to hosted Postgres (Supabase) - the same database whether run locally or deployed.")
+        st.caption(
+            "No ephemeral-storage risk: unlike a local SQLite file, this database persists "
+            "across redeploys/restarts and is reachable from anywhere, not just this machine."
         )
     else:
-        st.success(f"Well under the {WARNING_THRESHOLD_MB} MB sanity-check threshold.")
-    st.caption(
-        "SQLite itself has no meaningful ceiling for this use case (technical limit "
-        "is ~281 TB) - the real constraint is disk space on whatever machine runs it. "
-        "The threshold above is a bug-detection sanity check, not a genuine capacity "
-        "warning. One real risk: if this app is deployed to Streamlit Community Cloud "
-        "as-is, its containers are ephemeral - a local SQLite file can be wiped on "
-        "redeploy/restart. Migrating to hosted Postgres (already planned, see "
-        "docs/decision_log.md) removes that risk entirely."
-    )
+        db_size_mb = DB_PATH.stat().st_size / (1024 * 1024) if DB_PATH.exists() else 0
+        WARNING_THRESHOLD_MB = 200  # sanity-check threshold, not a real SQLite limit - see caption below
+        st.metric("Local database size", f"{db_size_mb:.2f} MB")
+        if db_size_mb > WARNING_THRESHOLD_MB:
+            st.warning(
+                f"Database has grown past {WARNING_THRESHOLD_MB} MB - unusual for this kind of "
+                "habit/goal-tracking data. Worth checking for unbounded log growth rather than "
+                "treating it as a real capacity limit (see caption below)."
+            )
+        else:
+            st.success(f"Well under the {WARNING_THRESHOLD_MB} MB sanity-check threshold.")
+        st.caption(
+            "SQLite itself has no meaningful ceiling for this use case (technical limit "
+            "is ~281 TB) - the real constraint is disk space on whatever machine runs it. "
+            "One real risk: if this app is deployed to Streamlit Community Cloud as-is, its "
+            "containers are ephemeral - a local SQLite file can be wiped on redeploy/restart. "
+            "Set DATABASE_URL (see docs/decision_log.md) to remove that risk entirely."
+        )
 
     st.divider()
     st.subheader("Platform feedback")
