@@ -10,6 +10,7 @@ from datetime import date, datetime, timedelta, timezone
 import streamlit as st
 
 from app.components.style import domain_icon, icon_md
+from engine.common.dates import to_date
 from engine.common.db import get_connection
 from engine.goals.schedule_status import ScheduleStatus, assess_schedule
 
@@ -48,7 +49,7 @@ def render_goal_card(g, show_domain: bool = True) -> None:
         with tc2.popover("Adjust", icon=":material/edit_calendar:", use_container_width=True):
             new_target_date = st.date_input(
                 "Target date",
-                value=date.fromisoformat(g["deadline"]) if g["deadline"] else date.today() + timedelta(days=30),
+                value=to_date(g["deadline"]) if g["deadline"] else date.today() + timedelta(days=30),
                 key=f"target_date_{g['id']}",
             )
             if st.button("Save", key=f"save_target_date_{g['id']}"):
@@ -177,14 +178,14 @@ def _render_todos(goal_id: str, tasks) -> None:
             icon=":material/event_busy:",
         )
 
-    ordered = sorted(tasks, key=lambda t: (t["deadline"] or "9999-99-99", t["created_at"]))
+    ordered = sorted(tasks, key=lambda t: (to_date(t["deadline"]) or date.max, str(t["created_at"])))
     with st.expander(f"Deliverables ({sum(1 for t in tasks if t['status'] == 'done')}/{len(tasks)})", expanded=len(tasks) > 0):
         today = date.today()
         for t in ordered:
             tc1, tc2 = st.columns([5, 3])
             label = t["title"]
             if t["deadline"]:
-                overdue_flag = t["status"] != "done" and date.fromisoformat(t["deadline"]) < today
+                overdue_flag = t["status"] != "done" and to_date(t["deadline"]) < today
                 label += f"  ({'⚠ ' if overdue_flag else ''}due {t['deadline']})"
             checked = tc1.checkbox(label, value=(t["status"] == "done"), key=f"task_done_{t['id']}")
             new_note = tc2.text_input(

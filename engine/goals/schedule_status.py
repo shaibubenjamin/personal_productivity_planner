@@ -8,6 +8,8 @@ actually overdue, not from an invented velocity target.
 from datetime import date
 from enum import Enum
 
+from engine.common.dates import to_date
+
 
 class ScheduleStatus(Enum):
     ON_COURSE = "ON_COURSE"
@@ -27,7 +29,7 @@ def assess_schedule(tasks, today: date | None = None) -> tuple[ScheduleStatus, l
     if not dated:
         return ScheduleStatus.NO_DEADLINES, []
 
-    overdue = [t for t in dated if t["status"] != "done" and date.fromisoformat(t["deadline"]) < today]
+    overdue = [t for t in dated if t["status"] != "done" and to_date(t["deadline"]) < today]
     if overdue:
         return ScheduleStatus.BEHIND, overdue
     return ScheduleStatus.ON_COURSE, []
