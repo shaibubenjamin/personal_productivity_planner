@@ -12,11 +12,13 @@ from app.components.style import domain_color, domain_icon, icon_md
 CARD_HEIGHT = 230
 
 
-def render_domain_card(d, badge_html: str | None = None) -> None:
+def render_domain_card(d, badge_html: str | None = None, goal_summary: tuple[int, int] | None = None) -> None:
+    """`goal_summary`, if given, is (on_course_count, total_goal_count) for
+    this domain - a real count from the schedule-status engine, not a
+    fabricated score."""
     icon = domain_icon(d["id"])
     color = domain_color(d["id"])
     weight = d["strategic_weight"]
-    min_attn = d["minimum_attention_pct"]
 
     with st.container(border=True, height=CARD_HEIGHT):
         st.markdown(
@@ -30,8 +32,19 @@ def render_domain_card(d, badge_html: str | None = None) -> None:
             unsafe_allow_html=True,
         )
         c1, c2 = st.columns(2)
-        c1.metric("Weight", f"{weight:.0f}%" if weight is not None else "—")
-        c2.metric("Min. attention", f"{min_attn:.0f}%" if min_attn is not None else "—")
+        c1.metric(
+            f"{icon_md('center_focus_strong')} Target focus",
+            f"{weight:.0f}%" if weight is not None else "—",
+            help="How much of your overall attention this domain should get, "
+                 "relative to the other domains (they all add up to 100%).",
+        )
+        if goal_summary is not None:
+            on_course, total = goal_summary
+            c2.metric(
+                f"{icon_md('check_circle')} On course",
+                f"{on_course}/{total}" if total else "—",
+                help="Goals in this domain currently on course, out of all goals here.",
+            )
 
         if badge_html:
             st.markdown(badge_html, unsafe_allow_html=True)

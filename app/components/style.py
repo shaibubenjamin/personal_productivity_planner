@@ -75,9 +75,12 @@ def inject_css() -> None:
         div[data-testid="stVerticalBlockBorderWrapper"]:hover {
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
         }
-
         /* Sidebar: give it a distinct tint + branded header block instead of
-           plain white, so navigation reads as a real product shell. */
+           plain white, so navigation reads as a real product shell.
+           NOTE: no blank lines anywhere in this block - CommonMark ends a
+           raw-HTML block (which <style> counts as) at the first blank line,
+           so anything after one renders as literal visible text instead of
+           being applied as CSS. Real bug, caught via owner screenshot. */
         [data-testid="stSidebar"] {
             background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
             border-right: 1px solid #E2E8F0;
@@ -99,7 +102,6 @@ def inject_css() -> None:
         .peos-sidebar-brand .peos-sidebar-tag {
             font-size: 0.72rem; color: #64748B;
         }
-
         /* Buttons: rounded, slightly elevated primary actions instead of
            Streamlit's flat default rectangles. */
         .stButton > button, .stFormSubmitButton > button, .stLinkButton > a {

@@ -45,10 +45,14 @@ with tab1:
     if not outputs:
         st.info("Nothing logged yet - add the weekly review email or daily brief below once you've read it.")
 
+    OUTPUT_TYPE_ICON = {
+        "daily_brief": "wb_sunny", "weekly_review_email": "mail",
+        "routine_run": "smart_toy", "other": "info",
+    }
     for o in outputs:
         with st.container(border=True):
             c1, c2 = st.columns([4, 1])
-            c1.markdown(f"**{o['subject'] or o['output_type']}**")
+            c1.markdown(f"**{icon_md(OUTPUT_TYPE_ICON.get(o['output_type'], 'info'))} {o['subject'] or o['output_type']}**")
             c1.caption(f"{o['output_type']} · sent {o['sent_at'] or o['created_at']}")
             reviewed = c2.checkbox("Reviewed", value=bool(o["reviewed"]), key=f"output_reviewed_{o['id']}")
             if o["summary"]:
@@ -103,7 +107,7 @@ with tab2:
         emails = conn.execute("SELECT COUNT(*) AS n FROM emails WHERE processed = FALSE").fetchone()["n"]
     finally:
         conn.close()
-    st.metric("Unprocessed emails in review queue", emails)
+    st.metric(f"{icon_md('mail')} Unprocessed emails in review queue", emails)
     if emails == 0:
         st.info(
             "Nothing here yet — the daily routine classifies email as part of "
@@ -118,7 +122,7 @@ with tab3:
         docs = conn.execute("SELECT COUNT(*) AS n FROM documents WHERE status = 'duplicate_candidate'").fetchone()["n"]
     finally:
         conn.close()
-    st.metric("Duplicate-candidate files", docs)
+    st.metric(f"{icon_md('content_copy')} Duplicate-candidate files", docs)
     if docs == 0:
         st.info(
             "No Drive housekeeping data persisted yet. A PEOS/ folder with "
@@ -138,7 +142,7 @@ with tab4:
     else:
         db_size_mb = DB_PATH.stat().st_size / (1024 * 1024) if DB_PATH.exists() else 0
         WARNING_THRESHOLD_MB = 200  # sanity-check threshold, not a real SQLite limit - see caption below
-        st.metric("Local database size", f"{db_size_mb:.2f} MB")
+        st.metric(f"{icon_md('database')} Local database size", f"{db_size_mb:.2f} MB")
         if db_size_mb > WARNING_THRESHOLD_MB:
             st.warning(
                 f"Database has grown past {WARNING_THRESHOLD_MB} MB - unusual for this kind of "
@@ -188,7 +192,7 @@ with tab4:
     if feedback_items:
         for f in feedback_items:
             with st.container(border=True):
-                st.markdown(f["note"])
+                st.markdown(f"{icon_md('feedback')} {f['note']}")
                 st.caption(f"{f['status']} · {f['created_at']}")
     else:
         st.info("No feedback logged yet.")

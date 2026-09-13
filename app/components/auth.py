@@ -150,7 +150,7 @@ def _inject_background() -> None:
 
     if photo_uris:
         n = len(photo_uris)
-        cycle_seconds = 10 * n
+        cycle_seconds = 7 * n
         step_pct = 100 / n
         keyframes = "".join(
             f"{i * step_pct:.4f}% {{ background-image: url(\"{uri}\"); }}\n"
