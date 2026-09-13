@@ -12,11 +12,31 @@ tasks:
 
   - goal_id: goal-financial-investing-forex
     domain_id: financial
+    title: "Learn ETF investing basics (what they are, how they trade, expense ratios)"
+    deadline: "2026-10-04"
+
+  - goal_id: goal-financial-investing-forex
+    domain_id: financial
+    title: "Learn bond investing basics (govt vs corporate, yield, duration risk)"
+    deadline: "2026-10-11"
+
+  - goal_id: goal-financial-investing-forex
+    domain_id: financial
+    title: "Learn share/stock investing basics (dividends, valuation, diversification)"
+    deadline: "2026-10-18"
+
+  - goal_id: goal-financial-investing-forex
+    domain_id: financial
+    title: "Read The Little Book of Common Sense Investing (John C. Bogle) - see Learning page"
+    deadline: "2026-11-15"
+
+  - goal_id: goal-financial-investing-forex
+    domain_id: financial
     title: "Define a concrete investing/forex learning plan (course + paper-trading account)"
     deadline: "2026-10-12"
 
   - goal_id: goal-relationships-career-networking
-    domain_id: relationships
+    domain_id: personal
     title: "List 5 target people/organisations/events to prioritise for networking"
     deadline: "2026-10-12"
 
@@ -41,7 +61,7 @@ tasks:
     deadline: "2026-10-12"
 
   - goal_id: goal-french-c2-by-30
-    domain_id: french
+    domain_id: personal
     title: "Reach A2 French level (first milestone toward C2)"
     deadline: "2026-11-15"
 

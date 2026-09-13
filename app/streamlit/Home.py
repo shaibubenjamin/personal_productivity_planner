@@ -42,23 +42,14 @@ if require_login():
     finally:
         conn.close()
 
+    # Plain text, no icon parameter - owner feedback 2026-09-13: icon
+    # shortcodes were showing up as literal text in places, and it should
+    # "feel written by a human."
     if overdue_deliverables:
-        st.sidebar.markdown(
-            f'<div style="background:#FEE2E2; color:#B91C1C; padding:0.5rem 0.75rem; '
-            f'border-radius:0.5rem; font-weight:600; margin-bottom:0.5rem;">'
-            f":material/schedule: {overdue_deliverables} overdue deliverable"
-            f"{'s' if overdue_deliverables != 1 else ''}</div>",
-            unsafe_allow_html=True,
-        )
+        st.sidebar.error(f"{overdue_deliverables} overdue deliverable{'s' if overdue_deliverables != 1 else ''}")
 
     if new_opportunities:
-        st.sidebar.markdown(
-            f'<div style="background:#FEF3C7; color:#B45309; padding:0.5rem 0.75rem; '
-            f'border-radius:0.5rem; font-weight:600; margin-bottom:0.5rem;">'
-            f":material/notifications_active: {new_opportunities} new opportunit"
-            f"{'y' if new_opportunities == 1 else 'ies'}</div>",
-            unsafe_allow_html=True,
-        )
+        st.sidebar.warning(f"{new_opportunities} new opportunit{'y' if new_opportunities == 1 else 'ies'}")
 
     pages = {
         "Overview": [

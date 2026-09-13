@@ -23,7 +23,7 @@ from engine.common.db import get_connection, init_db  # noqa: E402
 from engine.goals.schedule_status import ScheduleStatus, assess_schedule  # noqa: E402
 
 init_db()
-page_header("dashboard", "Executive Dashboard", "Productivity Tracker — V1, Phase 1/4")
+page_header("dashboard", "Executive Dashboard")
 
 # At-a-glance: aggregate on-course/behind counts across every goal, computed
 # from the same engine that drives each goal's own badge - an executive
@@ -102,19 +102,13 @@ else:
     for item in due_items:
         overdue = to_date(item["deadline"]) < today_date
         icon = domain_icon(item["domain_id"])
+        tag_color = "red" if overdue else "orange"
         tag = "OVERDUE" if overdue else "DUE TODAY"
-        text_color, bg_color = ("#B91C1C", "#FEF2F2") if overdue else ("#B45309", "#FFFBEB")
-        st.markdown(
-            f'<div style="border-left: 4px solid {text_color}; background:{bg_color}; '
-            f'border-radius: 0.5rem; padding: 0.7rem 1rem; margin-bottom: 0.5rem; '
-            f'display:flex; align-items:center; justify-content:space-between;">'
-            f'<div>{icon_md(icon)} <b>{item["title"]}</b>'
-            f'<div style="color:#64748B; font-size:0.85rem;">{item["goal_name"]} · {item["domain_name"]}</div></div>'
-            f'<span style="color:{text_color}; font-weight:700; font-size:0.78rem; '
-            f'white-space:nowrap; margin-left:1rem;">{tag}</span>'
-            f"</div>",
-            unsafe_allow_html=True,
-        )
+        with st.container(border=True):
+            c1, c2 = st.columns([4, 1])
+            c1.markdown(f"{icon_md(icon)} **{item['title']}**")
+            c1.caption(f"{item['goal_name']} · {item['domain_name']}")
+            c2.markdown(f":{tag_color}[**{tag}**]")
 
 st.divider()
 

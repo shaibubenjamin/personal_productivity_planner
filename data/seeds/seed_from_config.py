@@ -26,7 +26,7 @@ def seed_domains(conn) -> int:
                 "name": d["name"],
                 "strategic_weight": d.get("strategic_weight"),
                 "minimum_attention_pct": d.get("minimum_attention_pct"),
-                "active": 1 if d.get("active", True) else 0,
+                "active": bool(d.get("active", True)),
             },
         )
     conn.commit()
@@ -48,6 +48,7 @@ def seed_goals(conn) -> int:
                 :deadline, :status, :next_action, :review_frequency, :last_reviewed, :owner
             )
             ON CONFLICT(id) DO UPDATE SET
+                domain_id=excluded.domain_id,
                 name=excluded.name, description=excluded.description,
                 why_it_matters=excluded.why_it_matters,
                 strategic_importance=excluded.strategic_importance,
@@ -134,6 +135,7 @@ def seed_tasks(conn) -> int:
             INSERT INTO tasks (id, goal_id, domain_id, title, deadline, status)
             VALUES (:id, :goal_id, :domain_id, :title, :deadline, 'not_started')
             ON CONFLICT(id) DO UPDATE SET
+                domain_id=excluded.domain_id,
                 title=excluded.title, deadline=excluded.deadline
             """,
             {
