@@ -30,7 +30,8 @@ page_header("dashboard", "Executive Dashboard", "Productivity Tracker — V1, Ph
 # dashboard should lead with this, not raw table-row counts.
 conn = get_connection()
 try:
-    goals = conn.execute("SELECT id FROM goals").fetchall()
+    goals = conn.execute("SELECT id, domain_id FROM goals").fetchall()
+    domain_names = {d["id"]: d["name"] for d in conn.execute("SELECT id, name FROM domains").fetchall()}
     tasks_by_goal: dict[str, list] = {}
     for t in conn.execute("SELECT goal_id, status, deadline FROM tasks").fetchall():
         tasks_by_goal.setdefault(t["goal_id"], []).append(t)
@@ -38,9 +39,19 @@ finally:
     conn.close()
 
 status_counts = {s: 0 for s in ScheduleStatus}
+# domain_id -> [on_course_count, total_count] - a real per-domain tally, not
+# a fabricated "life score" (life_balance.py deliberately avoids one too).
+domain_on_course: dict[str, list[int]] = {}
 for g in goals:
     status, _ = assess_schedule(tasks_by_goal.get(g["id"], []))
     status_counts[status] += 1
+    bucket = domain_on_course.setdefault(g["domain_id"], [0, 0])
+    bucket[1] += 1
+    if status == ScheduleStatus.ON_COURSE:
+        bucket[0] += 1
+
+st.markdown(f"### {icon_md('insights')} Overall")
+st.caption("How your whole life is tracking right now, across every goal in every domain.")
 
 m1, m2, m3, m4 = st.columns(4)
 m1.metric(":material/flag: Goals tracked", len(goals))
@@ -48,6 +59,14 @@ m2.metric(":material/check_circle: On course", status_counts[ScheduleStatus.ON_C
 m3.metric(":material/schedule: Falling behind", status_counts[ScheduleStatus.BEHIND])
 open_ended = status_counts[ScheduleStatus.NO_DEADLINES] + status_counts[ScheduleStatus.NO_TASKS]
 m4.metric(":material/event_busy: Open-ended", open_ended)
+
+if domain_on_course:
+    st.caption("On course, by domain - so you can see which areas of your life need attention:")
+    domain_cols = st.columns(len(domain_on_course))
+    for col, (domain_id, (on_course, total)) in zip(domain_cols, sorted(domain_on_course.items())):
+        with col:
+            st.caption(domain_names.get(domain_id, domain_id))
+            st.progress(on_course / total if total else 0, text=f"{on_course}/{total}")
 
 st.divider()
 
@@ -122,7 +141,8 @@ else:
     cols = st.columns(2)
     for i, d in enumerate(domains):
         with cols[i % 2]:
-            render_domain_card(d)
+            summary = domain_on_course.get(d["id"])
+            render_domain_card(d, goal_summary=tuple(summary) if summary else None)
 
 st.divider()
 st.caption(

@@ -13,6 +13,7 @@ from app.components.domain_card import render_domain_card  # noqa: E402
 from app.components.style import page_header, status_pill  # noqa: E402
 from engine.balance.balance import BalanceStatus, DomainAttention, assess_life_balance  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
+from engine.goals.schedule_status import ScheduleStatus, assess_schedule  # noqa: E402
 
 init_db()
 
@@ -56,9 +57,27 @@ if configured:
     ]
     results = assess_life_balance(attentions)
 
+    conn = get_connection()
+    try:
+        goals = conn.execute("SELECT id, domain_id FROM goals").fetchall()
+        tasks_by_goal: dict[str, list] = {}
+        for t in conn.execute("SELECT goal_id, status, deadline FROM tasks").fetchall():
+            tasks_by_goal.setdefault(t["goal_id"], []).append(t)
+    finally:
+        conn.close()
+
+    domain_on_course: dict[str, list[int]] = {}
+    for g in goals:
+        status, _ = assess_schedule(tasks_by_goal.get(g["id"], []))
+        bucket = domain_on_course.setdefault(g["domain_id"], [0, 0])
+        bucket[1] += 1
+        if status == ScheduleStatus.ON_COURSE:
+            bucket[0] += 1
+
     by_id = {d["id"]: d for d in configured}
     cols = st.columns(2)
     for i, (domain_id, status) in enumerate(results.items()):
         badge = status_pill(status.value.replace("_", " "), status.value)
         with cols[i % 2]:
-            render_domain_card(by_id[domain_id], badge_html=badge)
+            summary = domain_on_course.get(domain_id)
+            render_domain_card(by_id[domain_id], badge_html=badge, goal_summary=tuple(summary) if summary else None)

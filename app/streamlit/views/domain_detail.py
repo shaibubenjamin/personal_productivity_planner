@@ -16,6 +16,7 @@ if str(REPO_ROOT) not in sys.path:
 from app.components.goal_card import render_goal_card  # noqa: E402
 from app.components.style import domain_icon, icon_md, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
+from engine.goals.schedule_status import ScheduleStatus, assess_schedule  # noqa: E402
 
 init_db()
 
@@ -40,10 +41,6 @@ else:
     st.page_link("views/dashboard.py", label="Executive Dashboard", icon=":material/arrow_back:")
     page_header(icon, d["name"])
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Strategic weight", f"{d['strategic_weight']:.0f}%" if d["strategic_weight"] is not None else "-")
-    c2.metric("Min. attention", f"{d['minimum_attention_pct']:.0f}%" if d["minimum_attention_pct"] is not None else "-")
-
     conn = get_connection()
     try:
         goals = conn.execute(
@@ -52,10 +49,29 @@ else:
             "ORDER BY strategic_importance DESC NULLS LAST",
             {"id": domain_id},
         ).fetchall()
+        tasks_by_goal: dict[str, list] = {}
+        for t in conn.execute(
+            "SELECT t.goal_id, t.status, t.deadline FROM tasks t "
+            "JOIN goals g ON t.goal_id = g.id WHERE g.domain_id = :id",
+            {"id": domain_id},
+        ).fetchall():
+            tasks_by_goal.setdefault(t["goal_id"], []).append(t)
     finally:
         conn.close()
 
-    c3.metric("Goals", len(goals))
+    on_course = sum(
+        1 for g in goals if assess_schedule(tasks_by_goal.get(g["id"], []))[0] == ScheduleStatus.ON_COURSE
+    )
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric(
+        f"{icon_md('center_focus_strong')} Target focus",
+        f"{d['strategic_weight']:.0f}%" if d["strategic_weight"] is not None else "-",
+        help="How much of your overall attention this domain should get, "
+             "relative to the other domains (they all add up to 100%).",
+    )
+    c2.metric(f"{icon_md('flag')} Goals", len(goals))
+    c3.metric(f"{icon_md('check_circle')} On course", f"{on_course}/{len(goals)}" if goals else "—")
     st.divider()
 
     if not goals:

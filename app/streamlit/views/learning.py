@@ -37,7 +37,8 @@ def _render_item(item) -> None:
     with st.container(border=True):
         c1, c2 = st.columns([5, 1])
         title = item["course"] if item["item_type"] == "book" else item["capability"]
-        c1.markdown(f"**{title}**")
+        item_icon = "menu_book" if item["item_type"] == "book" else "school"
+        c1.markdown(f"**{icon_md(item_icon)} {title}**")
         if item["item_type"] == "course":
             c1.caption(item["course"])
         else:

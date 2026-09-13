@@ -40,7 +40,8 @@ STATUS_LABEL = {"new": "New", "reviewed": "Reviewed", "actioned": "Actioned"}
 def _render_item(item) -> None:
     with st.container(border=True):
         c1, c2 = st.columns([4, 1])
-        c1.markdown(f"**{item['title']}**")
+        item_icon = CATEGORY_META.get(item["category"], (None, "lightbulb"))[1]
+        c1.markdown(f"**{icon_md(item_icon)} {item['title']}**")
         if item["url"]:
             c1.caption(item["url"])
         c1.caption(f"{item['topic'] or ''} · relevance {item['relevance'] if item['relevance'] is not None else '—'}")

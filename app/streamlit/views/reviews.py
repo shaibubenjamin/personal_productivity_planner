@@ -102,9 +102,14 @@ if not reviews:
         "progress view above is fully local and doesn't have that gap."
     )
 else:
+    REVIEW_TYPE_ICON = {
+        "daily": "today", "weekly": "date_range",
+        "monthly": "calendar_month", "quarterly": "calendar_view_month",
+    }
     for r in reviews:
         with st.container(border=True):
-            st.markdown(f"**{r['review_type'].title()} review — {r['review_date']}**")
+            review_icon = REVIEW_TYPE_ICON.get(r["review_type"], "fact_check")
+            st.markdown(f"**{icon_md(review_icon)} {r['review_type'].title()} review — {r['review_date']}**")
             if r["summary"]:
                 st.write(r["summary"])
 
@@ -154,11 +159,17 @@ with st.expander("Log a decision", icon=":material/add:"):
 if not decisions:
     st.info("No decisions logged yet.")
 else:
+    DECISION_TYPE_ICON = {
+        "prioritised": "priority_high", "deferred": "pause_circle",
+        "stopped": "stop_circle", "started": "play_circle",
+        "changed": "sync", "other": "more_horiz",
+    }
     goal_name_by_id = {g["id"]: g["name"] for g in all_goals}
     for dec in decisions:
         with st.container(border=True):
             c1, c2 = st.columns([4, 1])
-            c1.markdown(f"**{dec['description']}**")
+            dec_icon = DECISION_TYPE_ICON.get(dec["decision_type"], "more_horiz")
+            c1.markdown(f"**{icon_md(dec_icon)} {dec['description']}**")
             c2.markdown(f":gray[{dec['decision_type']}]")
             if dec["goal_id"] and dec["goal_id"] in goal_name_by_id:
                 st.caption(f"Goal: {goal_name_by_id[dec['goal_id']]}")

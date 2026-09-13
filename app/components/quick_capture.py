@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import streamlit as st
 
+from app.components.style import icon_md
 from engine.capture.triage import suggest_triage
 from engine.common.db import get_connection
 
@@ -61,7 +62,7 @@ def render_capture_inbox() -> None:
     with st.expander(f"Inbox to triage ({len(pending)})", expanded=True, icon=":material/inbox:"):
         for c in pending:
             with st.container(border=True):
-                st.markdown(f"**{c['raw_text']}**")
+                st.markdown(f"**{icon_md('edit_note')} {c['raw_text']}**")
 
                 current_domain_id = c["domain_id"] or ""
                 domain_names = list(domain_name_by_id.values())
