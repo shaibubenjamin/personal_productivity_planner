@@ -120,28 +120,72 @@ def _forest_svg() -> str:
     )
 
 
-def _background_data_uri() -> str:
-    """Real HD photo if the asset is present (read + base64 at runtime, not
-    baked into source); falls back to the hand-drawn SVG scene otherwise so
-    the login screen never breaks if the asset is ever missing."""
-    if BACKGROUND_PHOTO_PATH.exists():
-        encoded = base64.b64encode(BACKGROUND_PHOTO_PATH.read_bytes()).decode("ascii")
+def _data_uri(path: Path) -> str | None:
+    """base64 data URI for a real photo, read at runtime (not baked into
+    source); None if the asset is missing."""
+    if path.exists():
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
         return f"data:image/jpeg;base64,{encoded}"
-    return "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
+    return None
 
 
 def _inject_background() -> None:
-    """CSS-only: background-image data URI + a glass-card look for the
-    login form, all via a <style> block - the mechanism already proven to
-    render correctly elsewhere in this app (app/components/style.py)."""
-    data_uri = _background_data_uri()
+    """CSS-only background (a <style> block - the mechanism already proven
+    to render correctly elsewhere in this app, unlike raw injected
+    <div>/<script> tags via markdown, which silently fail to render as
+    real elements - see the module docstring).
+
+    The two photos alternate as the background via a pure-CSS crossfade
+    (two ::before/::after pseudo-elements on an existing element, each
+    animated with a complementary opacity keyframe) rather than being
+    shown at the same time in a split layout - owner feedback, 2026-09-13:
+    "the wallpaper is supposed to change or alternate between the two
+    images, not the second [being] on the first."
+    """
+    landscape_uri = _data_uri(BACKGROUND_PHOTO_PATH)
+    stag_uri = _data_uri(FEATURE_PHOTO_PATH)
+
+    if landscape_uri and stag_uri:
+        background_css = f"""
+        [data-testid="stAppViewContainer"] {{ position: relative; background: #0a2e42; }}
+        [data-testid="stAppViewContainer"]::before,
+        [data-testid="stAppViewContainer"]::after {{
+            content: ""; position: fixed; inset: 0;
+            background-size: cover; background-position: center center;
+            background-repeat: no-repeat; z-index: -1;
+        }}
+        [data-testid="stAppViewContainer"]::before {{
+            background-image: url("{landscape_uri}");
+            animation: peos-crossfade-a 24s ease-in-out infinite;
+        }}
+        [data-testid="stAppViewContainer"]::after {{
+            background-image: url("{stag_uri}");
+            animation: peos-crossfade-b 24s ease-in-out infinite;
+        }}
+        @keyframes peos-crossfade-a {{
+            0%, 40% {{ opacity: 1; }} 50%, 90% {{ opacity: 0; }} 100% {{ opacity: 1; }}
+        }}
+        @keyframes peos-crossfade-b {{
+            0%, 40% {{ opacity: 0; }} 50%, 90% {{ opacity: 1; }} 100% {{ opacity: 0; }}
+        }}
+        """
+    else:
+        # Only one photo (or neither) available - fall back to the
+        # hand-drawn SVG scene so the login screen never breaks.
+        single_uri = landscape_uri or stag_uri or (
+            "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
+        )
+        background_css = (
+            f'[data-testid="stAppViewContainer"] {{ background-image: url("{single_uri}"); '
+            "background-size: cover; background-position: center center; "
+            "background-attachment: fixed; background-repeat: no-repeat; }"
+        )
+
     st.markdown(
         "<style>"
-        f'[data-testid="stAppViewContainer"] {{ background-image: url("{data_uri}"); '
-        "background-size: cover; background-position: center center; "
-        "background-attachment: fixed; background-repeat: no-repeat; }}"
+        f"{background_css}"
         '[data-testid="stHeader"] { background: transparent; }'
-        ".block-container { padding-top: 3rem; max-width: 780px; }"
+        ".block-container { padding-top: 3rem; max-width: 560px; }"
         ".block-container h1 { color: #ECFDF5; text-align: center; "
         "text-shadow: 0 2px 10px rgba(0,0,0,0.6); font-weight: 700; }"
         '.block-container [data-testid="stCaptionContainer"] { color: #D1FAE5; '
@@ -149,8 +193,6 @@ def _inject_background() -> None:
         '[data-testid="stForm"] { background: rgba(255,255,255,0.94); '
         "padding: 1.75rem 1.75rem 1rem; border-radius: 1rem; "
         "box-shadow: 0 12px 40px rgba(0,0,0,0.45); backdrop-filter: blur(4px); }"
-        '[data-testid="stImage"] img { border-radius: 1rem; '
-        "box-shadow: 0 12px 40px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.25); }"
         "</style>",
         unsafe_allow_html=True,
     )
@@ -259,19 +301,11 @@ def require_login() -> bool:
     st.title("Productivity Tracker")
     st.caption("Track your goals, habits, and progress across every domain of your life.")
 
-    if FEATURE_PHOTO_PATH.exists():
-        col_photo, col_form = st.columns([1, 1.2], vertical_alignment="center")
-        with col_photo:
-            st.image(str(FEATURE_PHOTO_PATH), use_container_width=True)
+    _render_rotating_quote()
+    if credentials is None:
+        _render_create_password_form()
     else:
-        col_form = st.container()
-
-    with col_form:
-        _render_rotating_quote()
-        if credentials is None:
-            _render_create_password_form()
-        else:
-            _render_login_form(credentials["username"], credentials["password_salt"], credentials["password_hash"])
+        _render_login_form(credentials["username"], credentials["password_salt"], credentials["password_hash"])
 
     return False
 
