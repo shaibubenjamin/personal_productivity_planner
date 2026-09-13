@@ -59,7 +59,7 @@ SECTION_META = {
     ProgressCategory.STRUGGLING: ("Struggling", "warning", "#B91C1C"),
     ProgressCategory.REMAINING: ("Left To Start", "hourglass_empty", "#B45309"),
     ProgressCategory.COMPLETED: ("Completed", "celebration", "#4F46E5"),
-    ProgressCategory.ABANDONED: ("Abandoned", "delete", "#64748B"),
+    ProgressCategory.ABANDONED: ("Abandoned", "delete", "#78716C"),
 }
 
 cols = st.columns(len(SECTION_META))
