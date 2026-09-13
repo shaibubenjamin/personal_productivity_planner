@@ -18,6 +18,7 @@ if str(REPO_ROOT) not in sys.path:
 from app.components.goal_card import render_goal_card  # noqa: E402
 from app.components.style import page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
+from engine.goals.schedule_status import ScheduleStatus, assess_schedule  # noqa: E402
 
 init_db()
 page_header("flag", "Goals")
@@ -87,6 +88,42 @@ finally:
 
 if not goals:
     st.info("No goals yet - add one above.")
+else:
+    conn = get_connection()
+    try:
+        tasks_by_goal: dict[str, list] = {}
+        for t in conn.execute("SELECT goal_id, status, deadline FROM tasks").fetchall():
+            tasks_by_goal.setdefault(t["goal_id"], []).append(t)
+    finally:
+        conn.close()
 
-for g in goals:
-    render_goal_card(g, show_domain=True)
+    schedule_by_goal = {g["id"]: assess_schedule(tasks_by_goal.get(g["id"], []))[0] for g in goals}
+
+    STATUS_FILTER_LABELS = {
+        ScheduleStatus.ON_COURSE: "On course",
+        ScheduleStatus.BEHIND: "Falling behind",
+        ScheduleStatus.NO_DEADLINES: "No deadlines set",
+        ScheduleStatus.NO_TASKS: "No deliverables yet",
+    }
+
+    f1, f2, f3 = st.columns([2, 2, 3])
+    domain_filter = f1.selectbox("Domain", ["All"] + sorted({g["domain_name"] for g in goals}))
+    status_filter = f2.selectbox("Schedule status", ["All"] + list(STATUS_FILTER_LABELS.values()))
+    search = f3.text_input("Search goals", placeholder="Filter by name...")
+
+    filtered = goals
+    if domain_filter != "All":
+        filtered = [g for g in filtered if g["domain_name"] == domain_filter]
+    if status_filter != "All":
+        filtered = [g for g in filtered if STATUS_FILTER_LABELS[schedule_by_goal[g["id"]]] == status_filter]
+    if search.strip():
+        needle = search.strip().lower()
+        filtered = [g for g in filtered if needle in g["name"].lower()]
+
+    st.caption(f"Showing {len(filtered)} of {len(goals)} goal(s)")
+
+    if not filtered:
+        st.info("No goals match these filters.")
+    else:
+        for g in filtered:
+            render_goal_card(g, show_domain=True)

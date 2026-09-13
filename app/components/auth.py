@@ -1,7 +1,10 @@
-"""Single-user login gate. Credentials come from environment variables
-(local .env, loaded via python-dotenv) or Streamlit secrets (deployed) -
-never hardcoded, never committed. The password itself is stored only as a
-salted SHA-256 hash; see scripts/set_login_password.py to set one.
+"""Single-user login gate. Credentials live in the app_auth table (one row,
+id='singleton') - not Streamlit secrets/env vars. The app itself renders a
+"create your password" form on first run; the password is stored only as a
+salted SHA-256 hash. Since the local app and the deployed app already share
+the same database (see docs/decision_log.md - Postgres/Supabase
+migration), setting the password once works everywhere immediately,
+without needing to duplicate it into Streamlit Cloud's secrets box.
 
 Design note: an earlier version injected raw <div>/<svg>/<script> HTML via
 st.markdown(unsafe_allow_html=True) and it rendered as literal escaped text
@@ -21,14 +24,18 @@ markdown interpreting arbitrary HTML at all:
 import base64
 import hashlib
 import hmac
-import os
+import secrets
 import urllib.parse
+from datetime import datetime, timezone
 from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
 
+from engine.common.db import get_connection
+
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+FIXED_USERNAME = "benjaminshaibu01@gmail.com"
 # The wide landscape is the actual full-bleed background (genuinely wide/HD,
 # so background-size:cover doesn't have to stretch/distort it). The owner's
 # own stag photo is portrait and low-res (640x958) - stretching ANY portrait
@@ -113,28 +120,72 @@ def _forest_svg() -> str:
     )
 
 
-def _background_data_uri() -> str:
-    """Real HD photo if the asset is present (read + base64 at runtime, not
-    baked into source); falls back to the hand-drawn SVG scene otherwise so
-    the login screen never breaks if the asset is ever missing."""
-    if BACKGROUND_PHOTO_PATH.exists():
-        encoded = base64.b64encode(BACKGROUND_PHOTO_PATH.read_bytes()).decode("ascii")
+def _data_uri(path: Path) -> str | None:
+    """base64 data URI for a real photo, read at runtime (not baked into
+    source); None if the asset is missing."""
+    if path.exists():
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
         return f"data:image/jpeg;base64,{encoded}"
-    return "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
+    return None
 
 
 def _inject_background() -> None:
-    """CSS-only: background-image data URI + a glass-card look for the
-    login form, all via a <style> block - the mechanism already proven to
-    render correctly elsewhere in this app (app/components/style.py)."""
-    data_uri = _background_data_uri()
+    """CSS-only background (a <style> block - the mechanism already proven
+    to render correctly elsewhere in this app, unlike raw injected
+    <div>/<script> tags via markdown, which silently fail to render as
+    real elements - see the module docstring).
+
+    The two photos alternate as the background via a pure-CSS crossfade
+    (two ::before/::after pseudo-elements on an existing element, each
+    animated with a complementary opacity keyframe) rather than being
+    shown at the same time in a split layout - owner feedback, 2026-09-13:
+    "the wallpaper is supposed to change or alternate between the two
+    images, not the second [being] on the first."
+    """
+    landscape_uri = _data_uri(BACKGROUND_PHOTO_PATH)
+    stag_uri = _data_uri(FEATURE_PHOTO_PATH)
+
+    if landscape_uri and stag_uri:
+        background_css = f"""
+        [data-testid="stAppViewContainer"] {{ position: relative; background: #0a2e42; }}
+        [data-testid="stAppViewContainer"]::before,
+        [data-testid="stAppViewContainer"]::after {{
+            content: ""; position: fixed; inset: 0;
+            background-size: cover; background-position: center center;
+            background-repeat: no-repeat; z-index: -1;
+        }}
+        [data-testid="stAppViewContainer"]::before {{
+            background-image: url("{landscape_uri}");
+            animation: peos-crossfade-a 24s ease-in-out infinite;
+        }}
+        [data-testid="stAppViewContainer"]::after {{
+            background-image: url("{stag_uri}");
+            animation: peos-crossfade-b 24s ease-in-out infinite;
+        }}
+        @keyframes peos-crossfade-a {{
+            0%, 40% {{ opacity: 1; }} 50%, 90% {{ opacity: 0; }} 100% {{ opacity: 1; }}
+        }}
+        @keyframes peos-crossfade-b {{
+            0%, 40% {{ opacity: 0; }} 50%, 90% {{ opacity: 1; }} 100% {{ opacity: 0; }}
+        }}
+        """
+    else:
+        # Only one photo (or neither) available - fall back to the
+        # hand-drawn SVG scene so the login screen never breaks.
+        single_uri = landscape_uri or stag_uri or (
+            "data:image/svg+xml," + urllib.parse.quote(_forest_svg())
+        )
+        background_css = (
+            f'[data-testid="stAppViewContainer"] {{ background-image: url("{single_uri}"); '
+            "background-size: cover; background-position: center center; "
+            "background-attachment: fixed; background-repeat: no-repeat; }"
+        )
+
     st.markdown(
         "<style>"
-        f'[data-testid="stAppViewContainer"] {{ background-image: url("{data_uri}"); '
-        "background-size: cover; background-position: center center; "
-        "background-attachment: fixed; background-repeat: no-repeat; }}"
+        f"{background_css}"
         '[data-testid="stHeader"] { background: transparent; }'
-        ".block-container { padding-top: 3rem; max-width: 780px; }"
+        ".block-container { padding-top: 3rem; max-width: 560px; }"
         ".block-container h1 { color: #ECFDF5; text-align: center; "
         "text-shadow: 0 2px 10px rgba(0,0,0,0.6); font-weight: 700; }"
         '.block-container [data-testid="stCaptionContainer"] { color: #D1FAE5; '
@@ -142,8 +193,6 @@ def _inject_background() -> None:
         '[data-testid="stForm"] { background: rgba(255,255,255,0.94); '
         "padding: 1.75rem 1.75rem 1rem; border-radius: 1rem; "
         "box-shadow: 0 12px 40px rgba(0,0,0,0.45); backdrop-filter: blur(4px); }"
-        '[data-testid="stImage"] img { border-radius: 1rem; '
-        "box-shadow: 0 12px 40px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.25); }"
         "</style>",
         unsafe_allow_html=True,
     )
@@ -175,67 +224,88 @@ def _render_rotating_quote() -> None:
     )
 
 
-def _get_secret(key: str) -> str | None:
-    if hasattr(st, "secrets"):
-        try:
-            if key in st.secrets:
-                return st.secrets[key]
-        except Exception:
-            pass
-    return os.environ.get(key)
+def _load_credentials():
+    conn = get_connection()
+    try:
+        return conn.execute(
+            "SELECT username, password_salt, password_hash FROM app_auth WHERE id = 'singleton'"
+        ).fetchone()
+    finally:
+        conn.close()
+
+
+def _save_credentials(password: str) -> None:
+    salt = secrets.token_hex(16)
+    pw_hash = hashlib.sha256((salt + password).encode()).hexdigest()
+    now = datetime.now(timezone.utc).isoformat()
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT INTO app_auth (id, username, password_salt, password_hash, created_at, updated_at) "
+            "VALUES ('singleton', :username, :salt, :hash, :now, :now)",
+            {"username": FIXED_USERNAME, "salt": salt, "hash": pw_hash, "now": now},
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def _render_create_password_form() -> None:
+    st.caption(f"First-time setup - create a password for {FIXED_USERNAME}")
+    with st.form("create_password"):
+        pw1 = st.text_input("New password", type="password")
+        pw2 = st.text_input("Confirm password", type="password")
+        submitted = st.form_submit_button("Create password", type="primary", use_container_width=True)
+
+    if submitted:
+        if len(pw1) < 8:
+            st.error("Password must be at least 8 characters.")
+        elif pw1 != pw2:
+            st.error("Passwords don't match.")
+        else:
+            _save_credentials(pw1)
+            st.session_state[SESSION_KEY] = True
+            st.rerun()
+
+
+def _render_login_form(username: str, salt: str, pw_hash: str) -> None:
+    # Single-user app with one fixed account - asking for a username field
+    # alongside password was redundant, and the owner reported the field
+    # conflicting with the browser's own email/username autofill UI
+    # (2026-09-10). Password-only removes that entirely.
+    st.caption(f"Signing in as {username}")
+    with st.form("login"):
+        input_pw = st.text_input(
+            "Password", type="password", autocomplete="current-password",
+        )
+        submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
+
+    if submitted:
+        candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
+        if hmac.compare_digest(candidate_hash, pw_hash):
+            st.session_state[SESSION_KEY] = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
 
 
 def require_login() -> bool:
-    """Renders a login form if not authenticated. Returns True once logged in."""
+    """Renders a login (or first-run create-password) form if not
+    authenticated. Returns True once logged in."""
     if st.session_state.get(SESSION_KEY):
         return True
 
-    username = _get_secret("PEOS_AUTH_USERNAME")
-    salt = _get_secret("PEOS_AUTH_PASSWORD_SALT")
-    pw_hash = _get_secret("PEOS_AUTH_PASSWORD_HASH")
+    credentials = _load_credentials()
 
     _inject_background()
     st.title("Productivity Tracker")
     st.caption("Track your goals, habits, and progress across every domain of your life.")
 
-    if FEATURE_PHOTO_PATH.exists():
-        col_photo, col_form = st.columns([1, 1.2], vertical_alignment="center")
-        with col_photo:
-            st.image(str(FEATURE_PHOTO_PATH), use_container_width=True)
+    _render_rotating_quote()
+    if credentials is None:
+        _render_create_password_form()
     else:
-        col_form = st.container()
-
-    with col_form:
-        _render_rotating_quote()
-
-        if not (username and salt and pw_hash):
-            st.error(
-                "Login is not configured - set PEOS_AUTH_USERNAME, "
-                "PEOS_AUTH_PASSWORD_SALT, and PEOS_AUTH_PASSWORD_HASH in your "
-                "local .env, or in Streamlit secrets once deployed."
-            )
-            return False
-
-        # Single-user app with one fixed account - asking for a username
-        # field alongside password was redundant, and the owner reported
-        # the field conflicting with the browser's own email/username
-        # autofill UI (2026-09-10). Password-only removes that entirely
-        # and is simpler, which is also just better UX for a one-user app.
-        st.caption(f"Signing in as {username}")
-        with st.form("login"):
-            input_pw = st.text_input(
-                "Password", type="password", autocomplete="current-password",
-            )
-            submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
-
-        if submitted:
-            candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
-            pw_ok = hmac.compare_digest(candidate_hash, pw_hash)
-            if pw_ok:
-                st.session_state[SESSION_KEY] = True
-                st.rerun()
-            else:
-                st.error("Incorrect password.")
+        _render_login_form(credentials["username"], credentials["password_salt"], credentials["password_hash"])
 
     return False
 

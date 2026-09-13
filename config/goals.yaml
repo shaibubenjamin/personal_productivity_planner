@@ -16,6 +16,58 @@ goals:
     next_action: "Target date is a default (2027-03-12, 6 months out) - not owner-confirmed. It's an interim checkpoint (meaningful progress on the top 3 ranked capabilities), not 'all 9 capabilities complete' - see config/learning_items.yaml for the ranked list."
     owner: benjaminshaibu01@gmail.com
 
+  - id: goal-career-learn-aws
+    domain_id: career
+    name: "Learn AWS Cloud"
+    description: "Target date is a default (2026-11-13, 2 months out) - not owner-confirmed."
+    why_it_matters: "Cloud infrastructure skill underpinning the stated career direction (data/AI/digital public infrastructure at scale)."
+    strategic_importance: 7
+    target_date: "2026-11-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: complete an AWS Cloud Practitioner fundamentals course."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-career-learn-azure
+    domain_id: career
+    name: "Learn Azure Cloud"
+    description: "Target date is a default (2026-12-13, 3 months out) - not owner-confirmed."
+    why_it_matters: "Cloud infrastructure skill underpinning the stated career direction; many public-sector/development-finance partners run on Azure specifically."
+    strategic_importance: 6
+    target_date: "2026-12-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: complete an Azure Fundamentals (AZ-900) course."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-career-learn-gcp
+    domain_id: career
+    name: "Learn GCP Cloud"
+    description: "Target date is a default (2027-01-13, 4 months out) - not owner-confirmed."
+    why_it_matters: "Cloud infrastructure skill underpinning the stated career direction; GCP is the common home for the geospatial/AI tooling (BigQuery GIS, Earth Engine) closest to the stated climate/geospatial focus."
+    strategic_importance: 6
+    target_date: "2027-01-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: complete a GCP Cloud Digital Leader or fundamentals course."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-career-learn-apache-sedona
+    domain_id: career
+    name: "Learn Apache Sedona"
+    description: "Target date is a default (2027-02-13, 5 months out) - not owner-confirmed. Sequenced after the cloud fundamentals above since Sedona workloads typically run on one of them."
+    why_it_matters: "Direct, specific match to the stated career direction: geospatial intelligence + AI/data at scale for public-system problems - Sedona is the leading open-source engine for exactly that (large-scale geospatial big data processing)."
+    strategic_importance: 8
+    target_date: "2027-02-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: complete an Apache Sedona getting-started tutorial and run a first geospatial query."
+    owner: benjaminshaibu01@gmail.com
+
   - id: goal-financial-investing-forex
     domain_id: financial
     name: "Learn investing and forex trading"
@@ -119,15 +171,79 @@ goals:
 
   - id: goal-personal-learn-swim
     domain_id: personal
-    name: "Learn to swim"
-    description: "Target date is a default (2026-12-09, 3 months out) - not owner-confirmed, adjust as needed."
-    why_it_matters: "Owner-stated personal development goal, 2026-09-09."
+    name: "Become good at swimming"
+    description: "Upgraded 2026-09-13 from the original 'learn to swim' goal (owner request) - the bar is proficiency, not just basic ability. Target date pushed out accordingly (was 2026-12-09, now 2027-03-13) - not owner-confirmed, adjust as needed."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-09; raised to 'become good' 2026-09-13."
     strategic_importance: 5
-    target_date: "2026-12-09"
+    target_date: "2027-03-13"
     status: not_started
     progress: 0
     confidence: LOW
     next_action: "First deliverable: book a swimming lesson / find a pool and instructor - see config/course_modules.yaml for the dated to-do."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-play-lawn-tennis
+    domain_id: personal
+    name: "Play lawn tennis"
+    description: "Target date is a default (2026-12-13, 3 months out) - not owner-confirmed. Needs a court, partner, and gear, hence a longer window than chess/pool."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-13."
+    strategic_importance: 4
+    target_date: "2026-12-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: find a tennis court/partner and play a first session."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-play-pool
+    domain_id: personal
+    name: "Play pool"
+    description: "Target date is a default (2026-11-13, 2 months out) - not owner-confirmed. Distinct from the existing snooker goal - different table/balls/rules."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-13."
+    strategic_importance: 4
+    target_date: "2026-11-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: find a pool table/venue and play a first game."
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-canada-express-entry
+    domain_id: personal
+    name: "Canadian Express Entry process"
+    description: >
+      Federal skilled-worker immigration pathway via IRCC's Express Entry
+      system (Comprehensive Ranking System / CRS). Target date is a default
+      (2027-05-13, 8 months out) representing "profile submitted and
+      actively in the pool" - not owner-confirmed, and NOT a promise of
+      when an Invitation to Apply (ITA) actually arrives, since that
+      depends on CRS score and draw cutoffs, neither of which is
+      controllable on a fixed timeline.
+    why_it_matters: "Owner-stated active process, 2026-09-13."
+    strategic_importance: 8
+    target_date: "2027-05-13"
+    status: in_progress
+    progress: 0
+    confidence: LOW
+    next_action: >
+      Checklist below (config/life_domain_deliverables.yaml) covers language
+      test, ECA, work-experience documentation, proof of funds, police
+      clearance, passport/photo, CRS scoring, and profile submission. Fee
+      and fund-threshold figures change - verify current amounts directly
+      on canada.ca/express-entry before relying on any number quoted here.
+    owner: benjaminshaibu01@gmail.com
+
+  - id: goal-personal-play-piano
+    domain_id: personal
+    name: "Play the piano"
+    description: "Target date is a default (2027-03-13, 6 months out) - not owner-confirmed. Longer window than the other games here since it's a skill built over many sessions, not a one-off activity."
+    why_it_matters: "Owner-stated personal development goal, 2026-09-13."
+    strategic_importance: 4
+    target_date: "2027-03-13"
+    status: not_started
+    progress: 0
+    confidence: LOW
+    next_action: "First deliverable: get access to a piano/keyboard and complete a first beginner lesson."
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-personal-learn-chess

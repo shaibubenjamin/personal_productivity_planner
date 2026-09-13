@@ -44,3 +44,97 @@ tasks:
     domain_id: french
     title: "Reach A2 French level (first milestone toward C2)"
     deadline: "2026-11-15"
+
+  - goal_id: goal-personal-play-lawn-tennis
+    domain_id: personal
+    title: "Find a tennis court/partner and play a first session"
+    deadline: "2026-10-04"
+
+  - goal_id: goal-personal-play-pool
+    domain_id: personal
+    title: "Find a pool table/venue and play a first game"
+    deadline: "2026-09-27"
+
+  - goal_id: goal-personal-play-piano
+    domain_id: personal
+    title: "Get access to a piano/keyboard and complete a first beginner lesson"
+    deadline: "2026-09-27"
+
+  - goal_id: goal-career-learn-aws
+    domain_id: career
+    title: "Complete an AWS Cloud Practitioner fundamentals course"
+    deadline: "2026-09-27"
+
+  - goal_id: goal-career-learn-azure
+    domain_id: career
+    title: "Complete an Azure Fundamentals (AZ-900) course"
+    deadline: "2026-10-04"
+
+  - goal_id: goal-career-learn-gcp
+    domain_id: career
+    title: "Complete a GCP Cloud Digital Leader or fundamentals course"
+    deadline: "2026-10-11"
+
+  - goal_id: goal-career-learn-apache-sedona
+    domain_id: career
+    title: "Complete an Apache Sedona getting-started tutorial and run a first geospatial query"
+    deadline: "2026-10-18"
+
+  # Canadian Express Entry checklist - each item is its own deliverable so
+  # every step can be ticked individually, per owner request 2026-09-13.
+  # Deadlines are a reasonable staggered sequence, not owner-confirmed -
+  # adjust per actual test-booking/processing availability.
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Check passport validity - renew if it won't be valid well past submission"
+    deadline: "2026-09-27"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Take a digital photo meeting IRCC's photo specifications"
+    deadline: "2026-09-27"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Estimate total cost (tests, ECA, police checks, medical, application/PR fees) - verify current amounts on canada.ca before budgeting"
+    deadline: "2026-10-04"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Calculate CRS score and check Provincial Nominee Program (PNP) options"
+    deadline: "2026-10-04"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Gather work-experience reference letters (duties/hours/NOC code) from employers"
+    deadline: "2026-10-11"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Confirm proof-of-funds threshold for a single applicant on canada.ca and arrange the funds"
+    deadline: "2026-10-11"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Book and take a language proficiency test (IELTS/CELPIP for English or TEF/TCF for French)"
+    deadline: "2026-10-25"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Apply for police clearance certificate(s) - every country lived in 6+ months since age 18"
+    deadline: "2026-10-25"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Apply for an Educational Credential Assessment (ECA), e.g. via WES"
+    deadline: "2026-11-08"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Create and submit the online Express Entry profile once documents above are ready"
+    deadline: "2026-11-22"
+
+  - goal_id: goal-personal-canada-express-entry
+    domain_id: personal
+    title: "Book the IRCC panel-physician medical exam (typically after an ITA arrives)"
+    deadline: "2026-12-06"
