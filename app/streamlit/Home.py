@@ -22,9 +22,12 @@ from engine.common.db import get_connection, init_db  # noqa: E402
 
 st.set_page_config(page_title="Productivity Tracker", page_icon=":material/dashboard:", layout="wide")
 
+# Must run before require_login(): the login gate itself reads/writes the
+# app_auth table, so the schema needs to exist first.
+init_db()
+
 if require_login():
     inject_css()
-    init_db()
 
     conn = get_connection()
     try:

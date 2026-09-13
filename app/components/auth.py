@@ -1,7 +1,10 @@
-"""Single-user login gate. Credentials come from environment variables
-(local .env, loaded via python-dotenv) or Streamlit secrets (deployed) -
-never hardcoded, never committed. The password itself is stored only as a
-salted SHA-256 hash; see scripts/set_login_password.py to set one.
+"""Single-user login gate. Credentials live in the app_auth table (one row,
+id='singleton') - not Streamlit secrets/env vars. The app itself renders a
+"create your password" form on first run; the password is stored only as a
+salted SHA-256 hash. Since the local app and the deployed app already share
+the same database (see docs/decision_log.md - Postgres/Supabase
+migration), setting the password once works everywhere immediately,
+without needing to duplicate it into Streamlit Cloud's secrets box.
 
 Design note: an earlier version injected raw <div>/<svg>/<script> HTML via
 st.markdown(unsafe_allow_html=True) and it rendered as literal escaped text
@@ -21,14 +24,18 @@ markdown interpreting arbitrary HTML at all:
 import base64
 import hashlib
 import hmac
-import os
+import secrets
 import urllib.parse
+from datetime import datetime, timezone
 from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
 
+from engine.common.db import get_connection
+
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+FIXED_USERNAME = "benjaminshaibu01@gmail.com"
 # The wide landscape is the actual full-bleed background (genuinely wide/HD,
 # so background-size:cover doesn't have to stretch/distort it). The owner's
 # own stag photo is portrait and low-res (640x958) - stretching ANY portrait
@@ -175,24 +182,78 @@ def _render_rotating_quote() -> None:
     )
 
 
-def _get_secret(key: str) -> str | None:
-    if hasattr(st, "secrets"):
-        try:
-            if key in st.secrets:
-                return st.secrets[key]
-        except Exception:
-            pass
-    return os.environ.get(key)
+def _load_credentials():
+    conn = get_connection()
+    try:
+        return conn.execute(
+            "SELECT username, password_salt, password_hash FROM app_auth WHERE id = 'singleton'"
+        ).fetchone()
+    finally:
+        conn.close()
+
+
+def _save_credentials(password: str) -> None:
+    salt = secrets.token_hex(16)
+    pw_hash = hashlib.sha256((salt + password).encode()).hexdigest()
+    now = datetime.now(timezone.utc).isoformat()
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT INTO app_auth (id, username, password_salt, password_hash, created_at, updated_at) "
+            "VALUES ('singleton', :username, :salt, :hash, :now, :now)",
+            {"username": FIXED_USERNAME, "salt": salt, "hash": pw_hash, "now": now},
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def _render_create_password_form() -> None:
+    st.caption(f"First-time setup - create a password for {FIXED_USERNAME}")
+    with st.form("create_password"):
+        pw1 = st.text_input("New password", type="password")
+        pw2 = st.text_input("Confirm password", type="password")
+        submitted = st.form_submit_button("Create password", type="primary", use_container_width=True)
+
+    if submitted:
+        if len(pw1) < 8:
+            st.error("Password must be at least 8 characters.")
+        elif pw1 != pw2:
+            st.error("Passwords don't match.")
+        else:
+            _save_credentials(pw1)
+            st.session_state[SESSION_KEY] = True
+            st.rerun()
+
+
+def _render_login_form(username: str, salt: str, pw_hash: str) -> None:
+    # Single-user app with one fixed account - asking for a username field
+    # alongside password was redundant, and the owner reported the field
+    # conflicting with the browser's own email/username autofill UI
+    # (2026-09-10). Password-only removes that entirely.
+    st.caption(f"Signing in as {username}")
+    with st.form("login"):
+        input_pw = st.text_input(
+            "Password", type="password", autocomplete="current-password",
+        )
+        submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
+
+    if submitted:
+        candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
+        if hmac.compare_digest(candidate_hash, pw_hash):
+            st.session_state[SESSION_KEY] = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
 
 
 def require_login() -> bool:
-    """Renders a login form if not authenticated. Returns True once logged in."""
+    """Renders a login (or first-run create-password) form if not
+    authenticated. Returns True once logged in."""
     if st.session_state.get(SESSION_KEY):
         return True
 
-    username = _get_secret("PEOS_AUTH_USERNAME")
-    salt = _get_secret("PEOS_AUTH_PASSWORD_SALT")
-    pw_hash = _get_secret("PEOS_AUTH_PASSWORD_HASH")
+    credentials = _load_credentials()
 
     _inject_background()
     st.title("Productivity Tracker")
@@ -207,35 +268,10 @@ def require_login() -> bool:
 
     with col_form:
         _render_rotating_quote()
-
-        if not (username and salt and pw_hash):
-            st.error(
-                "Login is not configured - set PEOS_AUTH_USERNAME, "
-                "PEOS_AUTH_PASSWORD_SALT, and PEOS_AUTH_PASSWORD_HASH in your "
-                "local .env, or in Streamlit secrets once deployed."
-            )
-            return False
-
-        # Single-user app with one fixed account - asking for a username
-        # field alongside password was redundant, and the owner reported
-        # the field conflicting with the browser's own email/username
-        # autofill UI (2026-09-10). Password-only removes that entirely
-        # and is simpler, which is also just better UX for a one-user app.
-        st.caption(f"Signing in as {username}")
-        with st.form("login"):
-            input_pw = st.text_input(
-                "Password", type="password", autocomplete="current-password",
-            )
-            submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
-
-        if submitted:
-            candidate_hash = hashlib.sha256((salt + input_pw).encode()).hexdigest()
-            pw_ok = hmac.compare_digest(candidate_hash, pw_hash)
-            if pw_ok:
-                st.session_state[SESSION_KEY] = True
-                st.rerun()
-            else:
-                st.error("Incorrect password.")
+        if credentials is None:
+            _render_create_password_form()
+        else:
+            _render_login_form(credentials["username"], credentials["password_salt"], credentials["password_hash"])
 
     return False
 

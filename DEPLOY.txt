@@ -25,27 +25,25 @@ STEPS
    - Main file path: app/streamlit/Home.py
 
 4. Click "Advanced settings" BEFORE deploying, and paste this into the
-   Secrets box (TOML format). Do NOT commit these values anywhere - this
-   secrets box is the only place they should live for the deployed app:
+   Secrets box (TOML format). Do NOT commit this value anywhere - the
+   secrets box is the only place it should live for the deployed app:
 
-   PEOS_AUTH_USERNAME = "benjaminshaibu01@gmail.com"
-   PEOS_AUTH_PASSWORD_SALT = "<copy from your local .env>"
-   PEOS_AUTH_PASSWORD_HASH = "<copy from your local .env>"
-   DATABASE_URL = "<copy from your local .env, once the Postgres/Supabase migration is done>"
+   DATABASE_URL = "<copy from your local .env>"
 
-   Get the first three values from your local .env file (repo root,
+   Get it from the DATABASE_URL line in your local .env file (repo root,
    gitignored, not something Claude can read out to you here since it's
-   a secret - open it yourself in a text editor). DATABASE_URL is optional
-   until the Postgres migration (see docs/decision_log.md) is complete -
-   without it, the deployed app falls back to its own local SQLite file,
-   with the ephemeral-storage caveat below.
+   a secret - open it yourself in a text editor). Login credentials are
+   NOT set here - the app manages its own password, stored in the
+   database itself (see step 6).
 
 5. Click "Deploy". First build takes a minute or two.
 
-6. Log in at the deployed URL with the same username/password as your
-   local app (from LOGIN_PASSWORD_READ_ME_THEN_DELETE.txt, if you haven't
-   deleted it yet - the password itself, not the hash/salt, goes in your
-   browser login form, not in the secrets box above).
+6. Log in at the deployed URL. Since the deployed app and your local app
+   share the same database (DATABASE_URL above), whichever password you
+   already created locally works immediately - no separate setup needed.
+   If you haven't created one yet, the app itself will show a "create
+   your password" form the first time anyone opens it (locally or
+   deployed, whichever happens first) - set it there once.
 
 IMPORTANT - READ BEFORE RELYING ON THE DEPLOYED APP
 ----------------------------------------------------

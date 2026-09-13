@@ -40,7 +40,7 @@ def get_sqlite_connection(db_path: Path) -> sqlite3.Connection:
 # Parent-before-child order (matches data/schemas/schema.sql table order) -
 # required so foreign keys resolve correctly on first insert.
 TABLE_ORDER = [
-    "domains", "objectives", "goals", "goal_dependencies", "daily_habits",
+    "app_auth", "domains", "objectives", "goals", "goal_dependencies", "daily_habits",
     "platform_feedback", "goal_logs", "goal_risks", "projects", "tasks",
     "captures", "decision_log", "commitments", "calendar_events", "emails",
     "documents", "learning_items", "learning_item_logs", "reviews",

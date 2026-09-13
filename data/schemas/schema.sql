@@ -7,6 +7,20 @@ CREATE TYPE confidence_level AS ENUM ('HIGH', 'MEDIUM', 'LOW');
 CREATE TYPE automation_category AS ENUM ('A', 'B', 'C');
 CREATE TYPE action_status AS ENUM ('proposed', 'pending_batch_approval', 'pending_approval', 'approved', 'rejected', 'executed', 'failed');
 
+-- Single row (id = 'singleton'). Login credentials, created through the
+-- app's own "create your password" first-run form rather than requiring
+-- Streamlit secrets/env vars to be pre-configured - since the local and
+-- deployed app already share this same database, setting the password
+-- once works everywhere immediately.
+CREATE TABLE app_auth (
+    id TEXT PRIMARY KEY,
+    username TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE domains (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
