@@ -4,8 +4,22 @@ Idempotent: re-running upserts domains/goals rather than duplicating them.
 Run with: python -m data.seeds.seed_from_config
 """
 
+import re
+
 from engine.common.config import load_yaml
 from engine.common.db import get_connection, init_db
+
+
+def _slug(text: str, max_len: int = 40) -> str:
+    """Stable, content-derived slug - NOT based on list position. Task and
+    learning-item IDs used to be `{prefix}-{global_list_index}`, which
+    silently shifted (creating orphaned duplicate rows) every time an
+    earlier entry was added to the same YAML file - hit repeatedly this
+    session (French/Relationships domain merges, several rounds of new
+    goals). A slug of the actual content stays the same regardless of
+    what else is added elsewhere in the file."""
+    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return slug[:max_len].rstrip("-")
 
 
 def seed_domains(conn) -> int:
@@ -91,7 +105,7 @@ def seed_learning_items(conn) -> int:
 
     for item_type, items in (("course", courses), ("book", books)):
         for item in items:
-            item_id = f"{item_type}-{count}-{item['capability'][:20]}"
+            item_id = f"{item_type}-{_slug(item['capability'])}-{_slug(item.get('course') or '', 20)}"
             conn.execute(
                 """
                 INSERT INTO learning_items (
@@ -128,8 +142,8 @@ def seed_tasks(conn) -> int:
     tasks = []
     for filename in TASK_SOURCE_FILES:
         tasks.extend(load_yaml(filename).get("tasks") or [])
-    for i, t in enumerate(tasks):
-        task_id = f"task-{t['goal_id']}-{i}"
+    for t in tasks:
+        task_id = f"task-{t['goal_id']}-{_slug(t['title'])}"
         conn.execute(
             """
             INSERT INTO tasks (id, goal_id, domain_id, title, deadline, status)
