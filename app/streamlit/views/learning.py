@@ -46,7 +46,7 @@ def _render_item(item) -> None:
         done = c2.checkbox("Done", value=(item["status"] == "done"), key=f"litem_done_{item['id']}")
 
         if item["priority_label"]:
-            color = PRIORITY_COLOR.get(item["priority_label"], "#334155")
+            color = PRIORITY_COLOR.get(item["priority_label"], "#44403C")
             st.markdown(
                 f'<span style="color:{color}; font-weight:600;">{item["priority_label"]}</span>',
                 unsafe_allow_html=True,

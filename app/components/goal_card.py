@@ -18,7 +18,7 @@ SCHEDULE_BADGE = {
     ScheduleStatus.ON_COURSE: ("On course", "#15803D", "#DCFCE7"),
     ScheduleStatus.BEHIND: ("Falling behind", "#B91C1C", "#FEE2E2"),
     ScheduleStatus.NO_DEADLINES: ("No deadlines set", "#B45309", "#FEF3C7"),
-    ScheduleStatus.NO_TASKS: ("No deliverables yet", "#64748B", "#F1F5F9"),
+    ScheduleStatus.NO_TASKS: ("No deliverables yet", "#78716C", "#F5F5F4"),
 }
 
 STATUS_OPTIONS = ["not_started", "in_progress", "at_risk", "done", "abandoned"]
