@@ -11,9 +11,7 @@ import streamlit as st
 DOMAIN_ICONS = {
     "career": "work",
     "financial": "payments",
-    "relationships": "handshake",
     "marriage": "favorite",
-    "french": "translate",
     "academics": "school",
     "spiritual": "self_improvement",
     "personal": "person",
@@ -24,9 +22,7 @@ DOMAIN_ICONS = {
 DOMAIN_COLORS = {
     "career": "#4F46E5",
     "financial": "#059669",
-    "relationships": "#DB2777",
     "marriage": "#E11D48",
-    "french": "#2563EB",
     "academics": "#D97706",
     "spiritual": "#7C3AED",
     "personal": "#0891B2",

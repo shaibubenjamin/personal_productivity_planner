@@ -2,42 +2,42 @@
 # Cadence: one module every 3 days, starting 2026-09-08 (owner-set, 2026-09-08).
 tasks:
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 1"
     deadline: "2026-09-11"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 2"
     deadline: "2026-09-14"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 3"
     deadline: "2026-09-17"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 4"
     deadline: "2026-09-20"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 5"
     deadline: "2026-09-23"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 6"
     deadline: "2026-09-26"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 7"
     deadline: "2026-09-29"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 8"
     deadline: "2026-10-02"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 9"
     deadline: "2026-10-05"
   - goal_id: goal-french-building-structures-course
-    domain_id: french
+    domain_id: personal
     title: "Building Structures in French - Module 10"
     deadline: "2026-10-08"

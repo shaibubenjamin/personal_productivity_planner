@@ -57,6 +57,10 @@ courses:
     priority_label: "Critical"
 
 books:
+  - domain_id: financial
+    capability: "Investing fundamentals (ETFs, bonds, shares)"
+    course: "The Little Book of Common Sense Investing - John C. Bogle"
+
   - domain_id: career
     capability: "Systems thinking"
     course: "Thinking in Systems"
@@ -73,7 +77,7 @@ books:
     capability: "Concentration/productivity"
     course: "Deep Work"
 
-  - domain_id: relationships
+  - domain_id: personal
     capability: "Emotional/social capability"
     course: "Emotional Intelligence"
 
@@ -81,7 +85,7 @@ books:
     capability: "Negotiation"
     course: "Never Split the Difference"
 
-  - domain_id: relationships
+  - domain_id: personal
     capability: "Difficult conversations"
     course: "Crucial Conversations"
 
@@ -121,7 +125,7 @@ books:
     capability: "Marriage"
     course: "The Seven Principles for Making Marriage Work"
 
-  - domain_id: french
+  - domain_id: personal
     capability: "French"
     course: "Let's Learn French"
 

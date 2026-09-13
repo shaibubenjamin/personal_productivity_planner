@@ -25,12 +25,13 @@ def render_domain_card(d, badge_html: str | None = None, goal_summary: tuple[int
             f'<div class="peos-accent-bar" style="background:{color};"></div>',
             unsafe_allow_html=True,
         )
-        st.markdown(
-            f'<span class="peos-icon-chip" style="background:{color}22; color:{color};">'
-            f"{icon_md(icon)}</span>"
-            f'<span style="font-size:1.05rem; font-weight:600; vertical-align:middle;">{d["name"]}</span>',
-            unsafe_allow_html=True,
-        )
+        # Icon+name via plain markdown (no unsafe_allow_html) - the
+        # :material/x: shortcode only gets substituted for a real icon
+        # within genuine markdown text, not inside a hand-built HTML tag
+        # passed through unsafe_allow_html (CommonMark treats that as an
+        # opaque raw-HTML block and never re-parses its contents - real
+        # bug, caught via owner screenshot on the dashboard's Today section).
+        st.markdown(f"##### {icon_md(icon)} {d['name']}")
         c1, c2 = st.columns(2)
         c1.metric(
             f"{icon_md('center_focus_strong')} Target focus",
