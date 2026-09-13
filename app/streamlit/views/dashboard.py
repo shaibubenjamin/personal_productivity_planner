@@ -18,6 +18,7 @@ from app.components.daily_habit import render_daily_habit  # noqa: E402
 from app.components.domain_card import render_domain_card  # noqa: E402
 from app.components.quick_capture import render_capture_inbox, render_quick_capture  # noqa: E402
 from app.components.style import domain_icon, icon_md, page_header  # noqa: E402
+from engine.common.dates import to_date  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 from engine.goals.schedule_status import ScheduleStatus, assess_schedule  # noqa: E402
 
@@ -78,9 +79,9 @@ finally:
 if not due_items:
     st.success("Nothing overdue or due today - clear.")
 else:
-    today_str = date.today().isoformat()
+    today_date = date.today()
     for item in due_items:
-        overdue = item["deadline"] < today_str
+        overdue = to_date(item["deadline"]) < today_date
         icon = domain_icon(item["domain_id"])
         tag = "OVERDUE" if overdue else "DUE TODAY"
         text_color, bg_color = ("#B91C1C", "#FEF2F2") if overdue else ("#B45309", "#FFFBEB")

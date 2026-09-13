@@ -22,7 +22,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from app.components.google_links import calendar_quick_add_url, gmail_compose_url  # noqa: E402
-from app.components.style import page_header  # noqa: E402
+from app.components.style import icon_md, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 init_db()
@@ -108,9 +108,19 @@ by_category: dict[str, list] = {c: [] for c in CATEGORY_META}
 for i in items:
     by_category.setdefault(i["category"], []).append(i)
 
+new_count = sum(1 for i in items if i["status"] == "new")
+reviewed_count = sum(1 for i in items if i["status"] == "reviewed")
+actioned_count = sum(1 for i in items if i["status"] == "actioned")
+m1, m2, m3, m4 = st.columns(4)
+m1.metric(":material/inbox: Total items", len(items))
+m2.metric(":material/fiber_new: New", new_count)
+m3.metric(":material/visibility: Reviewed", reviewed_count)
+m4.metric(":material/task_alt: Actioned", actioned_count)
+st.divider()
+
 for category, (label, icon) in CATEGORY_META.items():
     entries = by_category.get(category, [])
-    st.subheader(f"{label} ({len(entries)})")
+    st.markdown(f"### {icon_md(icon)} {label} ({len(entries)})")
     if not entries:
         st.caption("Nothing here yet.")
     for entry in entries:

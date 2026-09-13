@@ -18,7 +18,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from app.components.google_links import calendar_quick_add_url  # noqa: E402
-from app.components.style import page_header  # noqa: E402
+from app.components.style import icon_md, page_header  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 init_db()
@@ -122,12 +122,12 @@ try:
 finally:
     conn.close()
 
-st.subheader(f"Career capability priorities ({sum(1 for c in courses if c['status'] == 'done')}/{len(courses)} done)")
+st.markdown(f"### {icon_md('work')} Career capability priorities ({sum(1 for c in courses if c['status'] == 'done')}/{len(courses)} done)")
 for c in courses:
     _render_item(c)
 
 st.divider()
-st.subheader(f"Planned book purchases ({sum(1 for b in books if b['status'] == 'done')}/{len(books)} done)")
+st.markdown(f"### {icon_md('menu_book')} Planned book purchases ({sum(1 for b in books if b['status'] == 'done')}/{len(books)} done)")
 for b in books:
     _render_item(b)
 

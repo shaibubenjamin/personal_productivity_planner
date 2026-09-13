@@ -17,7 +17,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from app.components.auth import render_logout_button, require_login  # noqa: E402
-from app.components.style import inject_css  # noqa: E402
+from app.components.style import inject_css, render_sidebar_brand  # noqa: E402
 from engine.common.db import get_connection, init_db  # noqa: E402
 
 st.set_page_config(page_title="Productivity Tracker", page_icon=":material/dashboard:", layout="wide")
@@ -28,6 +28,7 @@ init_db()
 
 if require_login():
     inject_css()
+    render_sidebar_brand()
 
     conn = get_connection()
     try:

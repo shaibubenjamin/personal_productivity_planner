@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from app.components.style import page_header  # noqa: E402
+from app.components.style import icon_md, page_header  # noqa: E402
 from engine.common.db import DB_PATH, get_connection, init_db  # noqa: E402
 
 init_db()
@@ -128,7 +128,7 @@ with tab3:
         )
 
 with tab4:
-    st.subheader("Storage")
+    st.markdown(f"### {icon_md('database')} Storage")
     if os.environ.get("DATABASE_URL"):
         st.success("Connected to hosted Postgres (Supabase) - the same database whether run locally or deployed.")
         st.caption(
@@ -156,7 +156,7 @@ with tab4:
         )
 
     st.divider()
-    st.subheader("Platform feedback")
+    st.markdown(f"### {icon_md('feedback')} Platform feedback")
     st.caption(
         "Log anything about the platform itself - not life/goal content - that "
         "should improve (confusing layout, a missing action, something that felt "

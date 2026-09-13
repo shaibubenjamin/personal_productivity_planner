@@ -24,7 +24,7 @@ init_db()
 
 page_header("fact_check", "Reviews")
 
-st.subheader("This Week's Progress")
+st.markdown(f"### {icon_md('trending_up')} This Week's Progress")
 st.caption(
     "Evidence-based, not a fabricated benchmark: a goal is \"struggling\" because "
     "it went quiet (no log entry in the last 7 days) or was explicitly marked "
@@ -83,7 +83,7 @@ for category, (label, icon, color) in SECTION_META.items():
     st.write("")
 
 st.divider()
-st.subheader("Daily / Weekly / Monthly / Quarterly briefs")
+st.markdown(f"### {icon_md('mail')} Daily / Weekly / Monthly / Quarterly briefs")
 
 conn = get_connection()
 try:
@@ -109,7 +109,7 @@ else:
                 st.write(r["summary"])
 
 st.divider()
-st.subheader("Decision Log")
+st.markdown(f"### {icon_md('history_edu')} Decision Log")
 st.caption(
     "Why a goal was prioritised, deferred, stopped, started, or changed - "
     "your own strategic reasoning (spec Section 35), so future reviews can "

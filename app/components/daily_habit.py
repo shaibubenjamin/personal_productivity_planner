@@ -7,6 +7,7 @@ from datetime import date
 
 import streamlit as st
 
+from engine.common.dates import to_date
 from engine.common.db import get_connection
 from engine.habits.streak import compute_streak
 
@@ -20,7 +21,7 @@ def render_daily_habit(habit_key: str, label: str) -> None:
             {"k": habit_key, "d": today},
         ).fetchone()
         completed_dates = {
-            date.fromisoformat(r["date"])
+            to_date(r["date"])
             for r in conn.execute(
                 "SELECT date FROM daily_habits WHERE habit_key = :k AND completed = :completed",
                 {"k": habit_key, "completed": True},
