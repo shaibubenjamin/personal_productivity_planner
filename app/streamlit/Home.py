@@ -61,7 +61,7 @@ if require_login():
         ],
         "System": [
             st.Page("views/learning.py", title="Learning", icon=":material/school:"),
-            st.Page("views/global_intelligence.py", title="Global Intelligence", icon=":material/public:"),
+            st.Page("views/global_intelligence.py", title="Global Opportunities", icon=":material/rocket_launch:"),
             st.Page("views/digital_housekeeping.py", title="Digital Housekeeping", icon=":material/cleaning_services:"),
             st.Page("views/admin.py", title="Admin", icon=":material/admin_panel_settings:"),
         ],
