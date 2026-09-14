@@ -5,6 +5,7 @@ Run with: python -m data.seeds.seed_from_config
 """
 
 import re
+from datetime import date, timedelta
 
 from engine.common.config import load_yaml
 from engine.common.db import get_connection, init_db
@@ -97,40 +98,90 @@ def seed_goals(conn) -> int:
     return len(goals)
 
 
-def seed_learning_items(conn) -> int:
+def seed_learning_goals(conn, today: date | None = None) -> int:
+    """Every course/book becomes a real goal with its own dated task,
+    instead of a standalone learning_items row with no timeline (owner
+    request 2026-09-14: "books to read are not standalone... every single
+    action should align with a goal... goal subdivided into task with
+    timeline"). Deadlines are computed here (staggered, not all piled on
+    one date) rather than hand-authored in YAML - config/learning_items.yaml
+    stays just the source list (capability/course/domain/priority);
+    priority_rank drives pacing for courses, list order for books.
+    """
+    today = today or date.today()
     config = load_yaml("learning_items.yaml")
     courses = config.get("courses") or []
     books = config.get("books") or []
     count = 0
 
-    for item_type, items in (("course", courses), ("book", books)):
-        for item in items:
-            item_id = f"{item_type}-{_slug(item['capability'])}-{_slug(item.get('course') or '', 20)}"
-            conn.execute(
-                """
-                INSERT INTO learning_items (
-                    id, domain_id, capability, course, item_type,
-                    priority_rank, priority_label, status, progress
-                ) VALUES (
-                    :id, :domain_id, :capability, :course, :item_type,
-                    :priority_rank, :priority_label, 'not_started', 0
-                )
-                ON CONFLICT(id) DO UPDATE SET
-                    domain_id=excluded.domain_id, capability=excluded.capability,
-                    course=excluded.course, priority_rank=excluded.priority_rank,
-                    priority_label=excluded.priority_label
-                """,
-                {
-                    "id": item_id,
-                    "domain_id": item["domain_id"],
-                    "capability": item["capability"],
-                    "course": item.get("course"),
-                    "item_type": item_type,
-                    "priority_rank": item.get("priority_rank"),
-                    "priority_label": item.get("priority_label"),
-                },
+    def _upsert(item_type: str, item: dict, deadline: str) -> None:
+        capability = item["capability"]
+        course = item.get("course") or ""
+        domain_id = item["domain_id"]
+        slug = _slug(f"{capability}-{course}", 50)
+        goal_id = f"goal-learning-{slug}"
+        verb = "Complete" if item_type == "course" else "Finish reading"
+        name = f"{verb}: {course.split('/')[0].split('(')[0].strip() or capability}"
+        importance = 10 - (item.get("priority_rank") or 5) if item_type == "course" else 5
+
+        conn.execute(
+            """
+            INSERT INTO goals (
+                id, domain_id, name, why_it_matters, strategic_importance,
+                deadline, status, progress, confidence, next_action
+            ) VALUES (
+                :id, :domain_id, :name, :why, :importance,
+                :deadline, 'not_started', 0, 'LOW', :next_action
             )
-            count += 1
+            ON CONFLICT(id) DO UPDATE SET
+                domain_id=excluded.domain_id, name=excluded.name,
+                why_it_matters=excluded.why_it_matters,
+                strategic_importance=excluded.strategic_importance,
+                deadline=excluded.deadline, next_action=excluded.next_action
+            """,
+            {
+                "id": goal_id,
+                "domain_id": domain_id,
+                "name": name,
+                "why": f"Capability build: {capability}." + (
+                    f" Priority: {item['priority_label']}." if item.get("priority_label") else ""
+                ),
+                "importance": importance,
+                "deadline": deadline,
+                "next_action": course or capability,
+            },
+        )
+        task_id = f"task-{goal_id}-main"
+        conn.execute(
+            """
+            INSERT INTO tasks (id, goal_id, domain_id, title, deadline, status)
+            VALUES (:id, :goal_id, :domain_id, :title, :deadline, 'not_started')
+            ON CONFLICT(id) DO UPDATE SET
+                domain_id=excluded.domain_id, title=excluded.title, deadline=excluded.deadline
+            """,
+            {
+                "id": task_id,
+                "goal_id": goal_id,
+                "domain_id": domain_id,
+                "title": name,
+                "deadline": deadline,
+            },
+        )
+
+    # Courses: staggered by priority_rank, 3 weeks apart, starting 6 weeks
+    # out - these are substantial capability-building courses.
+    for item in courses:
+        rank = item.get("priority_rank") or (len(courses) + 1)
+        deadline = (today + timedelta(weeks=6 + (rank - 1) * 3)).isoformat()
+        _upsert("course", item, deadline)
+        count += 1
+
+    # Books: staggered by list order, 2 weeks apart, starting 4 weeks out.
+    for i, item in enumerate(books):
+        deadline = (today + timedelta(weeks=4 + i * 2)).isoformat()
+        _upsert("book", item, deadline)
+        count += 1
+
     conn.commit()
     return count
 
@@ -170,9 +221,12 @@ def main() -> None:
     try:
         n_domains = seed_domains(conn)
         n_goals = seed_goals(conn)
-        n_learning = seed_learning_items(conn)
         n_tasks = seed_tasks(conn)
-        print(f"Seeded {n_domains} domains, {n_goals} goals, {n_learning} learning items, {n_tasks} tasks.")
+        n_learning = seed_learning_goals(conn)
+        print(
+            f"Seeded {n_domains} domains, {n_goals + n_learning} goals "
+            f"({n_learning} from learning items), {n_tasks + n_learning} tasks."
+        )
     finally:
         conn.close()
 

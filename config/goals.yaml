@@ -131,7 +131,7 @@ goals:
     owner: benjaminshaibu01@gmail.com
 
   - id: goal-academics-university-affiliation
-    domain_id: academics
+    domain_id: career
     name: "Enrol in a university program with strong network/affiliation value"
     description: "Goal is positioning for global opportunities and network, not the subject matter itself."
     why_it_matters: "Owner-stated academic priority, explicitly connected to career strategy per spec Domain 4."
