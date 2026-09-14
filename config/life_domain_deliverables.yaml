@@ -153,3 +153,63 @@ tasks:
     domain_id: personal
     title: "Book the IRCC panel-physician medical exam (typically after an ITA arrives)"
     deadline: "2026-12-06"
+
+  - goal_id: goal-financial-save-90pct-vida-income
+    domain_id: financial
+    title: "Set up an automatic 90% savings transfer for VIDA income"
+    deadline: "2026-09-28"
+
+  - goal_id: goal-financial-buy-building-abuja
+    domain_id: financial
+    title: "Research Abuja property listings/agents within the ₦20,000,000 budget"
+    deadline: "2026-10-19"
+
+  - goal_id: goal-financial-invest-across-markets
+    domain_id: financial
+    title: "Make a first allocation into a money market fund"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-financial-invest-across-markets
+    domain_id: financial
+    title: "Make a first investment in the stock/equities market"
+    deadline: "2026-10-26"
+
+  - goal_id: goal-financial-invest-across-markets
+    domain_id: financial
+    title: "Make a first trade in the forex market"
+    deadline: "2026-11-09"
+
+  - goal_id: goal-financial-invest-across-markets
+    domain_id: financial
+    title: "Make a first investment in the bond market"
+    deadline: "2026-11-23"
+
+  - goal_id: goal-financial-invest-across-markets
+    domain_id: financial
+    title: "Explore real estate/REITs as an investment vehicle"
+    deadline: "2026-12-07"
+
+  - goal_id: goal-financial-register-benca-group
+    domain_id: financial
+    title: "Reserve/register the BENCA Group business name (e.g. via CAC)"
+    deadline: "2026-10-05"
+
+  - goal_id: goal-financial-register-benca-group
+    domain_id: financial
+    title: "Complete full company incorporation for BENCA Group"
+    deadline: "2026-10-26"
+
+  - goal_id: goal-marriage-save-for-wedding
+    domain_id: marriage
+    title: "Set up a dedicated wedding-savings plan/account"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-marriage-save-for-after-wedding
+    domain_id: marriage
+    title: "Set up a dedicated post-marriage savings plan/account"
+    deadline: "2026-10-12"
+
+  - goal_id: goal-marriage-read-books-quarterly
+    domain_id: marriage
+    title: "Read the first marriage-prep book (pick from the Learning page's marriage books)"
+    deadline: "2026-12-14"
