@@ -1,16 +1,15 @@
 # Life domains and their strategic weights / minimum-attention thresholds.
 # Owner-confirmed 2026-09-12: Career is 50%, and every other domain shares
-# the remaining 50% equally. French merged into Personal 2026-09-13, then
-# Relationships also merged into Personal 2026-09-13 (owner request:
-# "Relationship should be inside Personal") - 5 other domains now, so
-# 50/5 = exactly 10% each. Owner's own priority ranking (2026-09-13, not
-# necessarily matching these weights 1:1): Career, Financial, Personal,
-# Marriage, Spiritual, Academics.
+# the remaining 50% equally. French and Relationships merged into Personal
+# 2026-09-13. Academics also merged into Career 2026-09-14 (owner request:
+# "anything I study going forward would feed into my career - I will not
+# be doing an educational activity that doesn't tie into a domain of my
+# life") - 4 other domains now, so 50/4 = exactly 12.5% each.
 domains:
   - id: personal
     name: Personal
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 12.5
+    minimum_attention_pct: 12.5
     active: true
     note: "Scope confirmed 2026-09-07: men's health and habits; French learning and Relationships both folded in here 2026-09-13."
 
@@ -19,32 +18,25 @@ domains:
     strategic_weight: 50
     minimum_attention_pct: 50
     active: true
-    note: "Owner-confirmed 2026-09-12: Career is 50% of total attention, every other domain splits the remaining 50% equally."
+    note: "Owner-confirmed 2026-09-12: Career is 50% of total attention, every other domain splits the remaining 50% equally. Academics folded in here 2026-09-14 - all study/education now serves career capability directly, no separate domain."
 
   - id: financial
     name: Financial
-    strategic_weight: 10
-    minimum_attention_pct: 10
-    active: true
-    note: "Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
-
-  - id: academics
-    name: Academics
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 12.5
+    minimum_attention_pct: 12.5
     active: true
     note: "Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: spiritual
     name: Spiritual
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 12.5
+    minimum_attention_pct: 12.5
     active: true
     note: "Practice confirmed 2026-09-07: rank/track Joshua Selman messages, derive applied action items from each. Weight % owner-confirmed 2026-09-12 (equal share of the non-Career 50%)."
 
   - id: marriage
     name: Marriage
-    strategic_weight: 10
-    minimum_attention_pct: 10
+    strategic_weight: 12.5
+    minimum_attention_pct: 12.5
     active: true
     note: "Treated as distinct from Personal (which now also covers general relationships/networking) per spec Domain 7. Goal: married by age 30 (~2027-09-17, assuming birthday 2026-09-17 turning 29)."

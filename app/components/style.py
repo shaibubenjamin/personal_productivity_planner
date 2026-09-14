@@ -12,7 +12,6 @@ DOMAIN_ICONS = {
     "career": "work",
     "financial": "payments",
     "marriage": "favorite",
-    "academics": "school",
     "spiritual": "self_improvement",
     "personal": "person",
 }
@@ -20,10 +19,9 @@ DOMAIN_ICONS = {
 # One accent color per domain - the "bring it to life" touch, used sparingly
 # (a thin top bar + icon chip on cards), not as loud full-card color.
 DOMAIN_COLORS = {
-    "career": "#4F46E5",
+    "career": "#1D4ED8",
     "financial": "#059669",
     "marriage": "#E11D48",
-    "academics": "#D97706",
     "spiritual": "#7C3AED",
     "personal": "#0891B2",
 }

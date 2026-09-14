@@ -19,7 +19,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from app.components.style import page_header  # noqa: E402
 from data.seeds.seed_from_config import (  # noqa: E402
-    seed_domains, seed_goals, seed_learning_items, seed_tasks,
+    seed_domains, seed_goals, seed_learning_goals, seed_tasks,
 )
 from engine.common.db import get_connection, init_db  # noqa: E402
 
@@ -208,7 +208,7 @@ with tab_database:
             conn.commit()
             seed_domains(conn)
             seed_goals(conn)
-            seed_learning_items(conn)
+            seed_learning_goals(conn)
             seed_tasks(conn)
         finally:
             conn.close()

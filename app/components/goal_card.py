@@ -34,12 +34,26 @@ STATUS_LABEL = {
 def render_goal_card(g, show_domain: bool = True) -> None:
     icon = domain_icon(g["domain_id"])
     with st.container(border=True):
-        c1, c2 = st.columns([4, 1])
-        label = f"### {icon_md(icon)} {g['name']}" if not show_domain else f"### {icon_md(icon)} {g['name']}"
+        c1, c2, c3 = st.columns([4, 1, 1])
+        label = f"### {icon_md(icon)} {g['name']}"
         c1.markdown(label)
         if show_domain:
             c1.caption(g["domain_name"])
         done = c2.checkbox("Done", value=(g["status"] == "done"), key=f"done_{g['id']}")
+        with c3.popover("Delete", icon=":material/delete:", use_container_width=True):
+            st.caption(f"Delete \"{g['name']}\" and every deliverable/log under it? This cannot be undone.")
+            if st.button("Confirm delete", key=f"confirm_delete_goal_{g['id']}", type="primary"):
+                conn = get_connection()
+                try:
+                    conn.execute("DELETE FROM goal_logs WHERE goal_id = :id", {"id": g["id"]})
+                    conn.execute("DELETE FROM decision_log WHERE goal_id = :id", {"id": g["id"]})
+                    conn.execute("UPDATE captures SET goal_id = NULL, resulting_task_id = NULL WHERE goal_id = :id", {"id": g["id"]})
+                    conn.execute("DELETE FROM tasks WHERE goal_id = :id", {"id": g["id"]})
+                    conn.execute("DELETE FROM goals WHERE id = :id", {"id": g["id"]})
+                    conn.commit()
+                finally:
+                    conn.close()
+                st.rerun()
 
         if g["why_it_matters"]:
             st.caption(g["why_it_matters"])
@@ -173,8 +187,8 @@ def _render_todos(goal_id: str, tasks) -> None:
         st.warning(f"Falling behind - {len(overdue)} overdue: {names}{more}", icon=":material/schedule:")
     elif schedule_status == ScheduleStatus.NO_DEADLINES:
         st.warning(
-            "None of these deliverables have a deadline yet - set one below so this "
-            "doesn't stay open-ended.",
+            "None of these deliverables have a deadline yet - open the ⋮ menu on "
+            "one below to set one, so this doesn't stay open-ended.",
             icon=":material/event_busy:",
         )
 
@@ -182,7 +196,7 @@ def _render_todos(goal_id: str, tasks) -> None:
     with st.expander(f"Deliverables ({sum(1 for t in tasks if t['status'] == 'done')}/{len(tasks)})", expanded=len(tasks) > 0):
         today = date.today()
         for t in ordered:
-            tc1, tc2 = st.columns([5, 3])
+            tc1, tc2, tc3 = st.columns([5, 2, 1])
             label = t["title"]
             if t["deadline"]:
                 overdue_flag = t["status"] != "done" and to_date(t["deadline"]) < today
@@ -192,6 +206,36 @@ def _render_todos(goal_id: str, tasks) -> None:
                 "note", value=t["notes"] or "", key=f"task_note_{t['id']}",
                 placeholder="note...", label_visibility="collapsed",
             )
+            with tc3.popover("⋮", use_container_width=True):
+                new_deadline = st.date_input(
+                    "Deadline", value=to_date(t["deadline"]) or date.today() + timedelta(days=7),
+                    key=f"task_adjust_deadline_{t['id']}",
+                )
+                if st.button("Save deadline", key=f"task_adjust_deadline_btn_{t['id']}"):
+                    conn = get_connection()
+                    try:
+                        conn.execute(
+                            "UPDATE tasks SET deadline = :deadline, updated_at = :now WHERE id = :id",
+                            {
+                                "deadline": new_deadline.isoformat(),
+                                "now": datetime.now(timezone.utc).isoformat(),
+                                "id": t["id"],
+                            },
+                        )
+                        conn.commit()
+                    finally:
+                        conn.close()
+                    st.rerun()
+                st.divider()
+                if st.button("Delete this deliverable", key=f"task_delete_{t['id']}", type="primary"):
+                    conn = get_connection()
+                    try:
+                        conn.execute("UPDATE captures SET resulting_task_id = NULL WHERE resulting_task_id = :id", {"id": t["id"]})
+                        conn.execute("DELETE FROM tasks WHERE id = :id", {"id": t["id"]})
+                        conn.commit()
+                    finally:
+                        conn.close()
+                    st.rerun()
 
             new_status = "done" if checked else ("in_progress" if t["status"] == "in_progress" else "not_started")
             if new_status != t["status"] or new_note != (t["notes"] or ""):
@@ -208,29 +252,6 @@ def _render_todos(goal_id: str, tasks) -> None:
                 finally:
                     conn.close()
                 st.rerun()
-
-            if not t["deadline"] and t["status"] != "done":
-                dc1, dc2 = st.columns([4, 1])
-                picked = dc1.date_input(
-                    "Set a deadline - currently open-ended",
-                    value=date.today() + timedelta(days=7),
-                    key=f"task_set_deadline_{t['id']}",
-                )
-                if dc2.button("Set", key=f"task_set_deadline_btn_{t['id']}"):
-                    conn = get_connection()
-                    try:
-                        conn.execute(
-                            "UPDATE tasks SET deadline = :deadline, updated_at = :now WHERE id = :id",
-                            {
-                                "deadline": picked.isoformat(),
-                                "now": datetime.now(timezone.utc).isoformat(),
-                                "id": t["id"],
-                            },
-                        )
-                        conn.commit()
-                    finally:
-                        conn.close()
-                    st.rerun()
 
         with st.form(f"add_task_form_{goal_id}", clear_on_submit=True):
             new_title = st.text_input("Add a deliverable", key=f"new_task_{goal_id}", placeholder="e.g. Finish chapter 3 of PMP prep")
