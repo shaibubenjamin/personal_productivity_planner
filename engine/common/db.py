@@ -24,7 +24,21 @@ _pg_engine = None  # lazily created, reused across get_connection() calls
 
 
 def _database_url() -> str | None:
-    return os.environ.get("DATABASE_URL")
+    """Forces the psycopg2 dialect explicitly, rather than leaving it to
+    SQLAlchemy's own driver auto-detection for a bare `postgresql://` URL.
+    Real bug, hit on Streamlit Cloud: a newer SQLAlchemy release there
+    resolved the driverless scheme to the psycopg (v3) dialect instead of
+    psycopg2 - which isn't installed (only psycopg2-binary is, in
+    requirements.txt) - raising ModuleNotFoundError at connect time. This
+    behaved differently there than in local testing purely because of
+    which SQLAlchemy version each environment happened to have installed,
+    not because of anything about the URL itself - forcing the dialect
+    removes that version-dependent ambiguity for good.
+    """
+    url = os.environ.get("DATABASE_URL")
+    if url and url.startswith("postgresql://"):
+        url = "postgresql+psycopg2://" + url[len("postgresql://"):]
+    return url
 
 
 def _postgres_engine():
