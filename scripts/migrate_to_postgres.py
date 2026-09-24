@@ -10,7 +10,6 @@ re-running after a partial failure won't duplicate rows.
 Usage: python -m scripts.migrate_to_postgres
 """
 
-import os
 import sqlite3
 import sys
 from pathlib import Path
@@ -26,6 +25,7 @@ load_dotenv()
 from sqlalchemy import create_engine, text  # noqa: E402
 
 from engine.common.db import DB_PATH, POSTGRES_CA_CERT_PATH, POSTGRES_SCHEMA_PATH  # noqa: E402
+from engine.common.db import _database_url  # noqa: E402
 
 
 def get_sqlite_connection(db_path: Path) -> sqlite3.Connection:
@@ -61,7 +61,7 @@ BOOLEAN_COLUMNS = {
 
 
 def main() -> None:
-    database_url = os.environ.get("DATABASE_URL")
+    database_url = _database_url()
     if not database_url:
         print("DATABASE_URL is not set in your environment/.env - nothing to do.")
         sys.exit(1)
