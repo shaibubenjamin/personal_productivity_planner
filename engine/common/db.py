@@ -9,6 +9,7 @@ hosted database on every page load, only to the local SQLite file.
 """
 
 import os
+import re
 import sqlite3
 from pathlib import Path
 from typing import Any
@@ -36,8 +37,11 @@ def _database_url() -> str | None:
     removes that version-dependent ambiguity for good.
     """
     url = os.environ.get("DATABASE_URL")
-    if url and url.startswith("postgresql://"):
-        url = "postgresql+psycopg2://" + url[len("postgresql://"):]
+    if url:
+        # Force psycopg2 regardless of what's already there (bare
+        # "postgresql://" or an explicit "postgresql+<anything>://") -
+        # covers any variant, not just the exact bare-scheme case.
+        url = re.sub(r"^postgresql(\+\w+)?://", "postgresql+psycopg2://", url, count=1)
     return url
 
 
